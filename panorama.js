@@ -1,4 +1,4 @@
-﻿window.onload = function () {
+window.onload = function () {
 
 	/*var initialPoint = 0;
 	var currentPoint = 0;
@@ -25,7 +25,7 @@
 	renderer = new THREE.WebGLRenderer({ antialias: true });
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	//                        色        α
-	renderer.setClearColorHex(0x000000, 1);
+	renderer.setClearColor(0x000000, 1);
 	document.body.appendChild(renderer.domElement);
 
 	// (2)シーンの作成
