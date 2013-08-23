@@ -80,7 +80,7 @@ window.onload = function () {
 	
 	material01 = new THREE.MeshBasicMaterial({
 		overdraw: true,
-	      map: THREE.ImageUtils.loadTexture('images/Panorama05.jpg')
+	      map: THREE.ImageUtils.loadTexture('images/4444.jpg')
 	});
 
 	material01.side = THREE.BackSide;
@@ -92,6 +92,19 @@ window.onload = function () {
 	mesh.position.z=0;
 
 
+//ボタンについて
+	var btnGeometry = new THREE.CylinderGeometry(20, 20, 20, 0, 10, false);
+	
+	material = new THREE.MeshLambertMaterial({color: 0x00FF00});
+	var btnMesh = new THREE.Mesh(btnGeometry, material);
+	
+	btnMesh.rotation = {x: 0, y: 0, z: 0};
+	btnMesh.position.z = 0;
+	btnMesh.position.y = 0;
+
+//ボタンを押すと次のポイントを読み込む
+	var getElementPosition = function(element) {
+	
 	geometry02 = new THREE.SphereGeometry(
 		radius,
 	      segmentsWidth,
@@ -100,8 +113,6 @@ window.onload = function () {
 	      phiLength,
 	      thetaStart,
 	      thetaLength
-		
-
 	);
 	
 	mesh.position.x=5;
@@ -117,7 +128,13 @@ window.onload = function () {
 	material02.side = THREE.BackSide;
 	mesh = new THREE.Mesh(geometry02, material02);
 	scene.add(mesh);
+	}
 
+
+
+	
+
+/*
 	geometry03 = new THREE.SphereGeometry(
 		radius,
 	      segmentsWidth,
@@ -143,7 +160,7 @@ window.onload = function () {
 	material03.side = THREE.BackSide;
 	mesh = new THREE.Mesh(geometry03, material03);
 	scene.add(mesh);
-
+*/
 
 	/*カメラ移動
 	var t=0;
