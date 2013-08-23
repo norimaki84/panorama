@@ -45,9 +45,6 @@ window.onload = function () {
 	scene.add(camera);
 
 
-	/*カメラコントロール*/
-
-
 	ambient = new THREE.AmbientLight(0xFFFFFF);
 	scene.add(ambient);
 
@@ -84,50 +81,48 @@ window.onload = function () {
 	});
 
 	material01.side = THREE.BackSide;
-	mesh = new THREE.Mesh(geometry01, material01);
-	scene.add(mesh);
+	mesh01 = new THREE.Mesh(geometry01, material01);
+	scene.add(mesh01);
 
-	mesh.position.x=0;
-	mesh.position.y=0;
-	mesh.position.z=0;
+	mesh01.position.x=0;
+	mesh01.position.y=0;
+	mesh01.position.z=0;
 
+//ボタン
+	var yomicomi =document.getElementById("yomicomi");
+		yomicomi.addEventListener("click" , a, true);
+		
+    function a(){
+	 
+		geometry02 = new THREE.SphereGeometry(
+			radius,
+			  segmentsWidth,
+			  segmentsHeight,
+			  phiStart,
+			  phiLength,
+			  thetaStart,
+			  thetaLength
+		);
+	　console.log("ああ");
+		
 
-//ボタンについて
-	var btnGeometry = new THREE.CylinderGeometry(20, 20, 20, 0, 10, false);
+	/*	var material02 = new THREE.MeshPhongMaterial({
+				color: 0xffffff
+		});
+		*/
+		material02 = new THREE.MeshBasicMaterial({
+			overdraw: true,
+			
+			map: THREE.ImageUtils.loadTexture('images/2222.jpg', new THREE.UVMapping(), function() { 
+				material02.side = THREE.BackSide;
+				mesh02 = new THREE.Mesh(geometry02, material02);
+
+				mesh02.position.x=5;
+				mesh02.position.y=0;
+				mesh02.position.z=5;
 	
-	material = new THREE.MeshLambertMaterial({color: 0x00FF00});
-	var btnMesh = new THREE.Mesh(btnGeometry, material);
-	
-	btnMesh.rotation = {x: 0, y: 0, z: 0};
-	btnMesh.position.z = 0;
-	btnMesh.position.y = 0;
-
-//ボタンを押すと次のポイントを読み込む
-	var getElementPosition = function(element) {
-	
-	geometry02 = new THREE.SphereGeometry(
-		radius,
-	      segmentsWidth,
-	      segmentsHeight,
-	      phiStart,
-	      phiLength,
-	      thetaStart,
-	      thetaLength
-	);
-	
-	mesh.position.x=5;
-	mesh.position.y=0;
-	mesh.position.z=5;
-
-	material02 = new THREE.MeshBasicMaterial({
-		overdraw: true,
-	      map: THREE.ImageUtils.loadTexture('images/2222.jpg')
-	});
-
-
-	material02.side = THREE.BackSide;
-	mesh = new THREE.Mesh(geometry02, material02);
-	scene.add(mesh);
+				scene.add(mesh02);})
+		});
 	}
 
 
