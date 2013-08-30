@@ -1,17 +1,5 @@
 window.onload = function () {
 
-	/*var initialPoint = 0;
-	var currentPoint = 0;
-	var points = [
-		{ x: 100, y:100, img:"aslfjks.jpg" },
-		{ x: 200, y:100, img:"assdass.jpg" },
-		{ x: 300, y:100, img:"asdajks.jpg" }
-	];
-	var links = [
-		{ from: 0, to: 1},
-		{ from: 1, to: 2}
-	];*/
-
 	if(!Detector.webgl) Detector.addGetWebGLMessage();
 
 	var renderer, scene, fov, camera, ambient, geometry, material, mesh, baseTime
@@ -35,8 +23,7 @@ window.onload = function () {
 
 	fov = 72;
 
-      
-	//                                   画角 アスペクト比
+    //                                   画角 アスペクト比
 	camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 10000);
 	   
 	camera.position = new THREE.Vector3(0, 1, -1);
