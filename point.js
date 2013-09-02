@@ -3,3 +3,5 @@ var points = [
 	{ x: 200, y:100, img:"assdass.jpg" },
 	{ x: 300, y:100, img:"asdajks.jpg" }
 ];
+
+//ｘ、ｙではなく緯度と経度と分かる変数名に変更
