@@ -1,7 +1,15 @@
 [
 	{
 		"name":"地図01"
-		
+		"description":"○○○",
+		"details": "○○○",
+		"initial_scene": { "point":" start", "direction":"0"} //directionの初期値は方角ではなく角度？
+		"points": [
+			{ "name":"01", "position":{ "x":"100", "y":"100"}},
+			{ "name":"02", "position":{ "x":"100", "y":"200"}},
+		],
+		"shortcuts": [
+		]
 	
 	}
 ]

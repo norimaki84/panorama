@@ -111,59 +111,10 @@ window.onload = function () {
 				scene.add(mesh02);})
 		});
 	}
-
-
-
 	
-
-/*
-	geometry03 = new THREE.SphereGeometry(
-		radius,
-	      segmentsWidth,
-	      segmentsHeight,
-	      phiStart,
-	      phiLength,
-	      thetaStart,
-	      thetaLength
-		
-
-	);
-	
-	mesh.position.x=15;
-	mesh.position.y=0;
-	mesh.position.z=10;
-
-	material03 = new THREE.MeshBasicMaterial({
-		overdraw: true,
-	      map: THREE.ImageUtils.loadTexture('images/3333.jpg')
-	});
-
-
-	material03.side = THREE.BackSide;
-	mesh = new THREE.Mesh(geometry03, material03);
-	scene.add(mesh);
-*/
-
-	/*カメラ移動
-	var t=0;
-	function loop() {
-		t++;
-		geometry01.rotation.set( t/100, 0, 0 );
-            geometry02.rotation.set( 0, t/100, 0 );
-	      renderer.clear();
-		renderer.render(scene, camera);
-		window.requestAnimationFrame(loop);
-      } 
-	function threeStart() {
-  		Three();
-  		Camera();
-  		Scene();   
-  		Light();
-  		Object();
-  		loop();
-	}*/
-
-	// (6)レンダリング
+	//ポイント移動
+	function 
+	//レンダリング
 	baseTime = +new Date;
 
 	function render() {
