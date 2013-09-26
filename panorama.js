@@ -9,21 +9,21 @@ window.onload = function () {
 	lat = 0, onMouseDownLat = 0,
 	phi = 0, theta = 0;
 
-	// (1)レンダラの初期化
+	//レンダラの初期化
 	renderer = new THREE.WebGLRenderer({ antialias: true });
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	//                        色        α
 	renderer.setClearColor(0x000000, 1);
 	document.body.appendChild(renderer.domElement);
 
-	// (2)シーンの作成
+	//シーンの作成
 	scene = new THREE.Scene();
 
-	// (3)カメラの作成
+	//カメラの作成
 
 	fov = 72;
 
-    //                                   画角 アスペクト比
+    //                                  　　　　　　　　 画角１A 　　　　　　　　　アスペクト比１A
 	camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 10000);
 	   
 	camera.position = new THREE.Vector3(0, 1, -1);
@@ -41,7 +41,7 @@ window.onload = function () {
 	  
 
 
-	// (5)表示する物体の作成
+	// 表示する物体の作成
 	radius = 1;
 	segmentsWidth = 32;
 	segmentsHeight = 16;
@@ -90,13 +90,8 @@ window.onload = function () {
 			  thetaStart,
 			  thetaLength
 		);
-	　console.log("ああ");
+		console.log("ああ");
 		
-
-	/*	var material02 = new THREE.MeshPhongMaterial({
-				color: 0xffffff
-		});
-		*/
 		material02 = new THREE.MeshBasicMaterial({
 			overdraw: true,
 			
@@ -112,8 +107,20 @@ window.onload = function () {
 		});
 	}
 	
-	//ポイント移動
-	function 
+	//ポイント(カメラの位置、注視点)移動
+	document.onkeydown = function(e) { 
+		if (keychar == "x") {
+			//
+			var rad deg * (Math.PI / 180);
+			//例；ｐ1＝(0、０、０)、ｐ２＝(５、０、５)
+			//θの計算式
+			var angle = atan( (a2*y - a1*y) /  (b2*x - b1*x));
+			
+	} 
+	
+	
+	
+	
 	//レンダリング
 	baseTime = +new Date;
 
