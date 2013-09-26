@@ -1,3 +1,8 @@
-body,content
-isVisible,
-//そのIDのときに表示したいもの、bodyの中に書く
+[
+	{
+		"map":"地図01",
+		"point":"start"",
+		"direction":"??",   //表示する向きは方角ではなく角度？
+		"text":"ああああああ"
+	}
+]
