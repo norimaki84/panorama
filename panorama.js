@@ -107,14 +107,33 @@ window.onload = function () {
 		});
 	}
 	
+	//毎フレーム
+	
+	dy = point[1].y - point[0].y;
+	dx = point[1].x - point[0].x;
+	duration =3000;
+	now =0;
+	next = 1;
+	t =0;
+	毎フレームwhile(t < duration){
+				x =( point[0].x + (point[1].x - point[0].x)) * t / duration;
+				y =( point[0].y + (point[1].y - point[0].y)) * t / duration;
+				t　+=1 /frameRate;
+				//x,yの場所にカメラ移動して描画
+			}
+	
+	
 	//ポイント(カメラの位置、注視点)移動
 	document.onkeydown = function(e) { 
 		if (keychar == "x") {
 			//
-			var rad deg * (Math.PI / 180);
+			var rad =  deg * (Math.PI / 180);
 			//例；ｐ1＝(0、０、０)、ｐ２＝(５、０、５)
 			//θの計算式
-			var angle = atan( (a2*y - a1*y) /  (b2*x - b1*x));
+			var angle = Math.atan( (a2*y - a1*y) /  (b2*x - b1*x));
+			
+			
+			
 			
 	} 
 	
