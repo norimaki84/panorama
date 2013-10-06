@@ -3,13 +3,15 @@
 		"name":"地図01"
 		"description":"○○○",
 		"details": "○○○",
-		"initial_scene": { "point":" start", "direction":"???"} //directionの初期値は方角ではなく角度？;
+		"initial_scene": { "point":" start", "direction":"0"} //directionの初期値は方角ではなく角度0度指定;
 		"points": [
-			{ "name":"01", "position":{ "x":"100", "y":"100"}},
-			{ "name":"02", "position":{ "x":"100", "y":"200"}},
-		],
-		"shortcuts": [
+			{ "name":"start", "position":{ "x":"100", "y":"100"}},
+			{ "name":"asasada", "position":{ "x":"100", "y":"200"}},
+			{ "name":"dsfsdfs"", "position":{ "x":"100", "y":"300"}},
 		]
+		//ショートカット
+		// "shortcuts": [
+		// ]
 	
 	}
 ]

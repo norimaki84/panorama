@@ -1,6 +1,4 @@
 var links = [
-		{ from: ”start”, to: ”asasada”},
-		{ from: ”asasada”, to: ”fdsfsdfs”};
+		{ "from": ”start”, "to": ”asasada”},
+		{ "from": ”asasada”, "to": ”fdsfsdfs”};
 	];
-	
-	//番号ではなくポイントごとにID振り分け
