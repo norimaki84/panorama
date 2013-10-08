@@ -106,15 +106,15 @@ window.onload = function () {
 	t =0;
 	
 	while(t < duration){
-				x =( point[now].x + (point[next].x - point[now].x)) * t / duration;
-				y =( point[now].y + (point[next].y - point[now].y)) * t / duration;
-				t　+= 1 /frameRate;
-				//x,yの場所にカメラ移動して描画
+		x =( point[now].x + (point[next].x - point[now].x)) * t / duration;
+		y =( point[now].y + (point[next].y - point[now].y)) * t / duration;
+		t　+= 1 /frameRate;
+		//x,yの場所にカメラ移動して描画
 	}
 	if(t >duration){
-				falg01	 = false;
-				t =0;
-	}			
+		falg01 = false;
+		t =0;
+	}
 	
 	
 	//ポイント(カメラの位置、注視点)移動
@@ -127,14 +127,14 @@ window.onload = function () {
 					creategeometry();
 					if(rightmoveFlag === true && leftmoveFlag === true){
 						loadingFlag = false;
-						 moveFlag = false;
+						moveFlag = false;
 					};
 				};
 			};
 		}; 
-	
+	};
 	//レンダリング
-	baseTime = +new Date;
+	baseTime += new Date;
 
 	function render() {
 		requestAnimationFrame(render);
@@ -152,26 +152,26 @@ window.onload = function () {
 
 	function onDocumentMouseDown( event ) {
 		event.preventDefault();
-			isUserInteracting = true;
-			onPointerDownPointerX = event.clientX;
-			onPointerDownPointerY = event.clientY;
-			onPointerDownLon = lon;
-			onPointerDownLat = lat;
+		isUserInteracting = true;
+		onPointerDownPointerX = event.clientX;
+		onPointerDownPointerY = event.clientY;
+		onPointerDownLon = lon;
+		onPointerDownLat = lat;
 
 
-			lat = Math.max( - 85, Math.min( 85, lat ) );
-			phi = ( 90 - lat ) * Math.PI / 180;
-			theta = lon * Math.PI / 180;
-			camera.target.x = 500 * Math.sin( phi ) * Math.cos( theta );
-			camera.target.y = 500 * Math.cos( phi );
-			camera.target.z = 500 * Math.sin( phi ) * Math.sin( theta );
-			camera.lookAt( camera.target );
+		lat = Math.max( - 85, Math.min( 85, lat ) );
+		phi = ( 90 - lat ) * Math.PI / 180;
+		theta = lon * Math.PI / 180;
+		camera.target.x = 500 * Math.sin( phi ) * Math.cos( theta );
+		camera.target.y = 500 * Math.cos( phi );
+		camera.target.z = 500 * Math.sin( phi ) * Math.sin( theta );
+		camera.lookAt( camera.target );
 	};
 
 	function onDocumentMouseMove( event ) {
 		if ( isUserInteracting ) {
-	      lon = ( onPointerDownPointerX - event.clientX ) * 0.1 + onPointerDownLon;
-	      lat = ( event.clientY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
+			lon = ( onPointerDownPointerX - event.clientX ) * 0.1 + onPointerDownLon;
+			lat = ( event.clientY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
 		}
 
 		lat = Math.max( - 85, Math.min( 85, lat ) );
