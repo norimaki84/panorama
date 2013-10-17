@@ -1,10 +1,5 @@
 /*jslint browser:true */
 /*global Detector, THREE, frameRate, keychar, requestAnimationFrame */
-var point = {},
-	start = 0,
-	now = 0,
-	next = 0;
-
 window.onload = function () {
 	'use strict';
 
