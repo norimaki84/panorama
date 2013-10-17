@@ -1,7 +1,7 @@
 jQuery(document).ready(function() {
 	var mapsFile = 'maps.json';
-	var linksFile = 'links.json';
-	var pointsFile = 'points.json';
+	var linksFile = 'points.json';
+	var pointsFile = 'links.json';
 	var dateFile = 'date.json';
 	var modalsFile = 'modals.json';
 
