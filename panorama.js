@@ -16,13 +16,14 @@ window.onload = function () {
 		creategeometry,
 		phi = 0, theta = 0,
 		loadingFlag, moveFlag, rightmoveFlag = false, leftmoveFlag = false,
-		// flag01,
+		flag01,
 		t,
-		// x, y,
+		x, y,
 		create = false,
 		onPointerDownPointerX, onPointerDownPointerY, onPointerDownLat, onPointerDownLon,
-		// dx, dy,
-		duration;
+		dx, dy,
+		duration,
+		translateFlag,
 
 	//レンダラの初期化
 	renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -109,42 +110,50 @@ window.onload = function () {
 		});
 	};
 
-
 	if(translateFlag === ture){
-		 移動処理
-		 if(移動が完了){
+		//移動処理
+		dy = point[next].y - point[now].y;
+		dx = point[next].x - point[now].x;
+		duration = 3000;
+		now = 0;
+		next = 1;
+		t = 0;
+
+		while (t < duration) {
+			x = (point[now].x + (point[next].x - point[now].x)) * t / duration;
+			y = (point[now].y + (point[next].y - point[now].y)) * t / duration;
+			t += 1 / frameRate;
+			//x,yの場所にカメラ移動して描画
+		}
+		if(t === duration){
 		 	translateFlag === ture;
-		 }
+		}
 	}else if (rotaetFlag = false){
-		回転移動処理
-		if(MouseUpみたいな){
+		//回転移動処理
+		onDocumentMouseMove();
+
+		if(onDocumentMouseUp === ture){
 			rotaetFlag = false;
 		}
 	}else 
 		if(クリック許可　|| keyDown){
-			平行移動初期化
+			//平行移動初期化
+			dy = point[next].y - point[now].y;
+			dx = point[next].x - point[now].x;
+			duration = 3000;
+			now = 0;
+			next = 1;
+			t = 0;
+
 			rotaetFlag = true;
 		}else if (mouseDown){
-			回転移動の初期化
+			//回転移動の初期化
 			rotaetFlag = ture;
 		} 
 	}
-	//毎フレームwhile
-	// dy = point[next].y - point[now].y;
-	// dx = point[next].x - point[now].x;
-	duration = 3000;
-	now = 0;
-	next = 1;
-	t = 0;
 
-	while (t < duration) {
-		// x = (point[now].x + (point[next].x - point[now].x)) * t / duration;
-		// y = (point[now].y + (point[next].y - point[now].y)) * t / duration;
-		t += 1 / frameRate;
-		//x,yの場所にカメラ移動して描画
-	}
 	if (t > duration) {
-		// flag01 = false;
+		flag01 = false;
 		t = 0;
 	}
 
@@ -166,7 +175,6 @@ window.onload = function () {
 	};
 
 	//レンダリング
-	// baseTime = new Date();
 
 	function render() {
 		requestAnimationFrame(render);
