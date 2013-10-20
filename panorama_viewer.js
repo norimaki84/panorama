@@ -59,7 +59,7 @@ jQuery(window).load(function() {
 });
 
 var initPanorama = function() {
-	construct(texts); //??
-	view_construct(); //??
-	init_help(); //??
+	construct(texts); //
+	view_construct(); //
+	init_help(); //
 };
