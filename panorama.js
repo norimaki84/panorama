@@ -2,7 +2,7 @@
 /*global Detector, THREE, frameRate, keychar, requestAnimationFrame */
 window.onload = function () {
 	'use strict';
-
+	
 	if (!Detector.webgl) { Detector.addGetWebGLMessage(); }
 
 	var renderer, scene, fov, camera, ambient,
@@ -17,12 +17,12 @@ window.onload = function () {
 		loadingFlag, moveFlag, rightmoveFlag = false, leftmoveFlag = false,
 		flag01,
 		t,
-		x, y,
+		x,　y,
 		create = false,
 		onPointerDownPointerX, onPointerDownPointerY, onPointerDownLat, onPointerDownLon,
-		dx, dy,
+		dx,　dy,
 		duration,
-		translateFlag,rotateFlag;
+		translateFlag,　rotateFlag;
 
 	//レンダラの初期化
 	renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -40,8 +40,8 @@ window.onload = function () {
 	// 画角１A アスペクト比１A
 	camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 10000);
 	//カメラ初期化
-	camera.position = new THREE.Vector3(0, 1, -1);   //カメラの初期位置
-	camera.target = new THREE.Vector3(0, 0, 0); //カメラの注視点
+	camera.position = new THREE.Vector3(0, 1, -1);//カメラの初期位置
+	camera.target = new THREE.Vector3(0, 0, 0);//カメラの注視点
 	camera.lookAt(camera.target);
 	scene.add(camera);
 
@@ -109,7 +109,7 @@ window.onload = function () {
 		});
 	};
 
-	if(translateFlag === ture){
+	if　(translateFlag === ture)　{
 		//移動処理
 		dy = point[next].y - point[now].y;
 		dx = point[next].x - point[now].x;
@@ -128,18 +128,18 @@ window.onload = function () {
 			camera.lookAt(camera.target);
 			scene.add(camera);
 		}
-		if(t === duration){
+		if　(t === duration)　{
 		 	translateFlag === ture;
 		}
-	}else if (rotaetFlag = false){
+	}　else if (rotaetFlag = false)　{
 		//回転移動処理
+		onDocumentMouseDown();
 		onDocumentMouseMove();
 
-		if(onDocumentMouseUp === ture){
+		if　(onDocumentMouseUp === ture)　{
 			rotateFlag = false;
 		}
-	}else 
-		if(クリック許可　|| keyDown){
+	}	else if　(クリック許可　|| keyDown)　{
 			//平行移動初期化
 			dy = point[next].y - point[now].y;
 			dx = point[next].x - point[now].x;
@@ -149,9 +149,9 @@ window.onload = function () {
 			t = 0;
 
 			rotateFlag = true;
-		}else if (mouseDown){
+		}　else if (mouseDown = true)　{
 			//回転移動の初期化
-			rotaetFlag = ture;
+			rotateFlag = ture;
 		} 
 	}
 
@@ -225,14 +225,6 @@ window.onload = function () {
 		camera.target.y = 500 * Math.cos(phi);
 		camera.target.z = 500 * Math.sin(phi) * Math.sin(theta);
 		camera.lookAt(camera.target);
-
-		if(MouseDownFlag === ture){
-			MouseMovelag = true; 
-		}
-		if(MouseUpFlag === ture){
-			MouseMovelag = false;	
-		}
-
 	}
 
 	function onDocumentMouseUp() {
