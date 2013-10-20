@@ -5,23 +5,54 @@ jQuery(document).ready(function() {
 	var dateFile = 'date.json';
 	var modalsFile = 'modals.json';
 
-	jQuery.getJSON(mapsFile, { format: 'json' }, function(json) {
-		maps = json;
+	Deferred.define();
+
+	next(function(){
+		jQuery.getJSON(mapsFile, { format: 'json' }, function(json) {
+			maps = json;
+		});
+	}).
+	error(funtion(e){
+		alert('エラー');
+	});
+
+	next(function(){
+		jQuery.getJSON(pointsFile, { format: 'json' }, function(json) {
+			pointss = json;
+		});
+	}).
+	error(funtion(e){
+		alert('エラー');
+	});
+
+	next(function(){
 		jQuery.getJSON(linksFile, { format: 'json' }, function(json) {
 			links = json;
-			jQuery.getJSON(pointsFile, { format: 'json' }, function(json) {
-				points = json;
-				jQuery.getJSON(dateFile, { format: 'json' }, function(json) {
-					date = json;
-					jQuery.getJSON(modalsFile, { format: 'json' }, function(json) {
-						modals = json;
-					initPanorama();
-					});
-				});
-			});
 		});
+	}).
+	error(funtion(e){
+		alert('エラー');
 	});
-});
+
+	next(function(){
+		jQuery.getJSON(dateFile, { format: 'json' }, function(json) {
+			date = json;
+		});
+	}).
+	error(funtion(e){
+		alert('エラー');
+	});
+
+	next(function(){
+		jQuery.getJSON(mapsFile, { format: 'json' }, function(json) {
+			modals = json;
+		});
+	}).
+	error(funtion(e){
+		alert('エラー');
+		initPanorama();
+	});
+)};
 
 jQuery(window).load(function() {
 
