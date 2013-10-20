@@ -6,7 +6,6 @@ window.onload = function () {
 	if (!Detector.webgl) { Detector.addGetWebGLMessage(); }
 
 	var renderer, scene, fov, camera, ambient,
-		// baseTime,
 		isUserInteracting = false,
 		lon = 0,
 		lat = 0,
@@ -23,7 +22,7 @@ window.onload = function () {
 		onPointerDownPointerX, onPointerDownPointerY, onPointerDownLat, onPointerDownLon,
 		dx, dy,
 		duration,
-		translateFlag,
+		translateFlag,rotateFlag;
 
 	//レンダラの初期化
 	renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -40,7 +39,7 @@ window.onload = function () {
 	fov = 72;
 	// 画角１A アスペクト比１A
 	camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 10000);
-
+	//カメラ初期化
 	camera.position = new THREE.Vector3(0, 1, -1);   //カメラの初期位置
 	camera.target = new THREE.Vector3(0, 0, 0); //カメラの注視点
 	camera.lookAt(camera.target);
@@ -123,7 +122,11 @@ window.onload = function () {
 			x = (point[now].x + (point[next].x - point[now].x)) * t / duration;
 			y = (point[now].y + (point[next].y - point[now].y)) * t / duration;
 			t += 1 / frameRate;
-			//x,yの場所にカメラ移動して描画
+			//x,yの場所にカメラを移動
+			camera.position = new THREE.Vector3(x, y, 0);   //カメラの移動後の位置
+			camera.target = new THREE.Vector3(x, y, 0); //カメラの移動後の注視点
+			camera.lookAt(camera.target);
+			scene.add(camera);
 		}
 		if(t === duration){
 		 	translateFlag === ture;
@@ -133,7 +136,7 @@ window.onload = function () {
 		onDocumentMouseMove();
 
 		if(onDocumentMouseUp === ture){
-			rotaetFlag = false;
+			rotateFlag = false;
 		}
 	}else 
 		if(クリック許可　|| keyDown){
@@ -145,7 +148,7 @@ window.onload = function () {
 			next = 1;
 			t = 0;
 
-			rotaetFlag = true;
+			rotateFlag = true;
 		}else if (mouseDown){
 			//回転移動の初期化
 			rotaetFlag = ture;
