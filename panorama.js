@@ -117,19 +117,31 @@ window.onload = function () {
         thetaLength
     );
 
-    material01 = new THREE.MeshBasicMaterial({
+    var loader = new THREE.JSONLoader();
+    loader.load('points.js', function(geometry) {
+        mesh = new THREE.Mesh(geometry01, new THREE.MeshFaceMaterial);
+        
+
+        material01.side = THREE.BackSide;
+        mesh01 = new THREE.Mesh(geometry01, material01);
+
+        material01 = new THREE.MeshBasicMaterial({
         overdraw: true,
-        map: THREE.ImageUtils.loadTexture('images/4444.jpg')
+        map: THREE.ImageUtils.loadTexture("start")
+        });
+
+        mesh01.position.x = point["start"].x;
+        mesh01.position.y = point["start"].y;
+
+        scene.add(mesh01);
     });
 
-    material01.side = THREE.BackSide;
-    mesh01 = new THREE.Mesh(geometry01, material01);
 
-    mesh01.position.x = point[start].x;
-    mesh01.position.y = point[start].y;
-    mesh01.position.z = point[start].z;
 
-    scene.add(mesh01);
+    
+    //mesh01.position.z = point[start].z;
+
+   
 
     //移動先の物体生成
     creategeometry = function () {
