@@ -1,65 +1,60 @@
-jQuery(document).ready(function() {
-	var mapsFile = 'maps.json';
-	var linksFile = 'points.json';
-	var pointsFile = 'links.json';
-	var dateFile = 'date.json';
-	var modalsFile = 'modals.json';
+/*jslint browser:true */
+/*global jQuery, Deferred */
 
-	Deferred.define();
+var maps, points, links, date, next, modals, mapsFile, linksFile, pointsFile, dateFile, modalsFile,
+    alert, initPanorama, construct, view_construct, init_help;
 
-	next(function(){
-		jQuery.getJSON(mapsFile, { format: 'json' }, function(json) {
-			maps = json;
-		});
-	}).
-	error(funtion(e){
-		alert('エラー');
-	});
+jQuery(document).ready(function () {
+    'use strict';
 
-	next(function(){
-		jQuery.getJSON(pointsFile, { format: 'json' }, function(json) {
-			pointss = json;
-		});
-	}).
-	error(funtion(e){
-		alert('エラー');
-	});
+    mapsFile = 'maps.json';
+    linksFile = 'links.json';
+    pointsFile = 'points.json';
+    dateFile = 'date.json';
+    modalsFile = 'modals.json';
 
-	next(function(){
-		jQuery.getJSON(linksFile, { format: 'json' }, function(json) {
-			links = json;
-		});
-	}).
-	error(funtion(e){
-		alert('エラー');
-	});
+    Deferred.define();
 
-	next(function(){
-		jQuery.getJSON(dateFile, { format: 'json' }, function(json) {
-			date = json;
-		});
-	}).
-	error(funtion(e){
-		alert('エラー');
-	});
+    next(function () {
+        return jQuery.getJSON(mapsFile, { format: 'json' }, function (json) {
+            maps = json;
+        });
+    }).error(function () {
+        alert("エラー");
+    }).next(function () {
+        return jQuery.getJSON(pointsFile, { format: 'json' }, function (json) {
+            points = json;
+        });
+    }).error(function () {
+        alert("エラー");
+    }).next(function () {
+        return jQuery.getJSON(linksFile, { format: 'json' }, function (json) {
+            links = json;
+        });
+    }).error(function () {
+        alert("エラー");
+    }).next(function () {
+        return jQuery.getJSON(dateFile, { format: 'json' }, function (json) {
+            date = json;
+        });
+    }).error(function () {
+        alert("エラー");
+    }).next(function () {
+        return jQuery.getJSON(mapsFile, { format: 'json' }, function (json) {
+            modals = json;
+        });
+    }).error(function () {
+        alert("エラー");
+        initPanorama();
+    });
+});
 
-	next(function(){
-		jQuery.getJSON(mapsFile, { format: 'json' }, function(json) {
-			modals = json;
-		});
-	}).
-	error(funtion(e){
-		alert('エラー');
-		initPanorama();
-	});
-)};
-
-jQuery(window).load(function() {
+jQuery(window).load(function () {
 
 });
 
-var initPanorama = function() {
-	construct(texts); //
-	view_construct(); //
-	init_help(); //
-};
+/* var initPanorama = function() {
+    construct(texts); 
+    view_construct(); 
+    init_help(); 
+};*/
