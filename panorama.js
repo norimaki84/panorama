@@ -22,7 +22,8 @@ window.onload = function () {
         dx, dy,
         duration,
         translateFlag = false, rotateFlag = false, keydownFlag = false, mouseDownFlag = false,
-        now, next;
+        now, next,
+        loader;
 
     //レンダラの初期化
     renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -117,18 +118,16 @@ window.onload = function () {
         thetaLength
     );
 
-    var loader = new THREE.JSONLoader();
-    loader.load('points.js', function(geometry) {
-        mesh = new THREE.Mesh(geometry01, new THREE.MeshFaceMaterial);
-        
+    loader = new THREE.JSONLoader();
+    loader.load('points.js', function (geometry01) {
+        //mesh01 = new THREE.Mesh(geometry01, new THREE.MeshFaceMaterial);
+        material01 = new THREE.MeshBasicMaterial({
+            overdraw : true,
+            //map: THREE.ImageUtils.loadTexture("start")
+        });
 
         material01.side = THREE.BackSide;
         mesh01 = new THREE.Mesh(geometry01, material01);
-
-        material01 = new THREE.MeshBasicMaterial({
-        overdraw: true,
-        map: THREE.ImageUtils.loadTexture("start")
-        });
 
         mesh01.position.x = point["start"].x;
         mesh01.position.y = point["start"].y;
@@ -136,12 +135,6 @@ window.onload = function () {
         scene.add(mesh01);
     });
 
-
-
-    
-    //mesh01.position.z = point[start].z;
-
-   
 
     //移動先の物体生成
     creategeometry = function () {
@@ -154,19 +147,21 @@ window.onload = function () {
             thetaStart,
             thetaLength
         );
-        material02 = new THREE.MeshBasicMaterial({
-            overdraw: true,
-            map: THREE.ImageUtils.loadTexture('images/2222.jpg', new THREE.UVMapping(), function () {
+        loader = new THREE.JSONLoader();
+        loader.load('points.js', function (geometry02) {
+            //152行のfunctionはコールバック関数として書いたつもり
+            material02 = new THREE.MeshBasicMaterial( function () {
+                overdraw : true,
+                //map: THREE.ImageUtils.loadTexture('images/2222.jpg', new THREE.UVMapping(), 
                 material02.side = THREE.BackSide;
                 mesh02 = new THREE.Mesh(geometry02, material02);
 
-                mesh02.position.x = point[next].x;
-                mesh02.position.y = point[next].y;
-                mesh02.position.z = point[next].z;
+                mesh02.position.x = point["next"].x;
+                mesh02.position.y = point["next"].y;
 
                 scene.add(mesh02);
                 loadingFlag = false;
-                moveFlag = true;
+                translateFlag = true;
             })
         });
     };
