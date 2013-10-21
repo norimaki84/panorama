@@ -1,2 +1,6 @@
-var currentPoint = "start";
-
+[
+    {
+        "firtstpoint" : "start",
+        "currentpoint" : "now"
+    }
+]

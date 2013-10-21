@@ -1,17 +1,13 @@
 [
-	{
-		"name":"地図01"
-		"description":"○○○",
-		"details": "○○○",
-		"initial_scene": { "point":" start", "direction":"0"} //directionの初期値は方角ではなく角度0度指定;
-		"points": [
-			{ "name":"start", "position":{ "x":"100", "y":"100"}},
-			{ "name":"asasada", "position":{ "x":"100", "y":"200"}},
-			{ "name":"dsfsdfs"", "position":{ "x":"100", "y":"300"}},
-		]
-		//ショートカット
-		// "shortcuts": [
-		// ]
-	
-	}
+    {
+        "name":"地図01",
+        "description" : "○○○",
+        "details": "○○○",
+        "initial_scene" : {"point" : "start", "direction" : "0"},
+        "points": [
+            { "name":"start", "position":{ "x":"100", "y":"100"}},
+            { "name":"asasada", "position":{ "x":"100", "y":"200"}},
+            { "name":"dsfsdfs", "position":{ "x":"100", "y":"300"}}
+        ]
+    }
 ]

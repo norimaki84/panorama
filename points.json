@@ -1,7 +1,5 @@
-var points = [
-	{ x : "100", y : "100", img : "aslfjks.jpg",  ID = "start" },
-	{ x : "200", y : "100", img : "assdass.jpg",  ID = "asasada" },
-	{ x : "300", y : "100", img : "asdajks.jpg",  ID = "fdsfsdfs" }
-];
-
-//ｘ、ｙではなく緯度と経度と分かる変数名に変更
+[
+    { "x" : "100", "y" : "100", "img" : "aslfjks.jpg",  "ID" : "start" },
+    { "x" : "200", "y" : "100", "img" : "assdass.jpg",  "ID" : "asasada" },
+    { "x" : "300", "y" : "100", "img" : "asdajks.jpg",  "ID" : "fdsfsdfs" }
+]
