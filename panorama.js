@@ -180,6 +180,11 @@ window.onload = function () {
             y = point[now].y + dy * t / duration;
             t += 1 / frameRate;
             //x,yの場所にカメラを移動
+            //カメラの作成
+            fov = 72;
+            // 画角１A アスペクト比１A
+            camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 10000);
+
             camera.position = new THREE.Vector3(x, y, 0);   //カメラの移動後の位置
             camera.target = new THREE.Vector3(x, y, 0); //カメラの移動後の注視点
             camera.lookAt(camera.target);
