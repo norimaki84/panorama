@@ -1,6 +1,6 @@
 /*jslint browser:true */
 /*global Detector, THREE, frameRate, keychar, requestAnimationFrame, points, start */
-window.onload = function () {
+var initPanorama = function () {
     'use strict';
 
     if (!Detector.webgl) { Detector.addGetWebGLMessage(); }
@@ -119,7 +119,7 @@ window.onload = function () {
 
     material01 = new THREE.MeshBasicMaterial({
         overdraw: true,
-        map: THREE.ImageUtils.loadTexture('points[1].img')
+        map: THREE.ImageUtils.loadTexture(points[1].img)
     });
 
     material01.side = THREE.BackSide;
@@ -145,7 +145,7 @@ window.onload = function () {
         );
         material02 = new THREE.MeshBasicMaterial({
             overdraw: true,
-            map: THREE.ImageUtils.loadTexture('points[2].img', new THREE.UVMapping(), function () {
+            map: THREE.ImageUtils.loadTexture(points[2].img, new THREE.UVMapping(), function () {
                 material02.side = THREE.BackSide;
                 mesh02 = new THREE.Mesh(geometry02, material02);
 
