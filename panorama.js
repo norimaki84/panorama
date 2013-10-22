@@ -1,5 +1,5 @@
 /*jslint browser:true */
-/*global Detector, THREE, frameRate, keychar, requestAnimationFrame, point, start */
+/*global Detector, THREE, frameRate, keychar, requestAnimationFrame, points, start */
 window.onload = function () {
     'use strict';
 
@@ -117,16 +117,16 @@ window.onload = function () {
         thetaLength
     );
 
-     material01 = new THREE.MeshBasicMaterial({
+    material01 = new THREE.MeshBasicMaterial({
         overdraw: true,
-        map: THREE.ImageUtils.loadTexture('images/4444.jpg')
+        map: THREE.ImageUtils.loadTexture('points[1].img')
     });
 
     material01.side = THREE.BackSide;
     mesh01 = new THREE.Mesh(geometry01, material01);
 
-    mesh01.position.x = point["start"].x;
-    mesh01.position.y = point["start"].y;
+    mesh01.position.x = points[1].x;
+    mesh01.position.y = points[1].y;
     //mesh01.position.z = point[start].z;
 
     scene.add(mesh01);
@@ -143,14 +143,14 @@ window.onload = function () {
             thetaStart,
             thetaLength
         );
-         material02 = new THREE.MeshBasicMaterial({
+        material02 = new THREE.MeshBasicMaterial({
             overdraw: true,
-            map: THREE.ImageUtils.loadTexture('images/2222.jpg', new THREE.UVMapping(), function () {
+            map: THREE.ImageUtils.loadTexture('points[2].img', new THREE.UVMapping(), function () {
                 material02.side = THREE.BackSide;
                 mesh02 = new THREE.Mesh(geometry02, material02);
 
-                mesh02.position.x = point["next"].x;
-                mesh02.position.y = point["next"].y;
+                mesh02.position.x = points[2].x;
+                mesh02.position.y = points[2].y;
                 //mesh02.position.z = point[next].z;
 
                 scene.add(mesh02);
@@ -162,16 +162,16 @@ window.onload = function () {
 
     if (translateFlag === true) {
         //移動処理
-        dy = point[next].y - point[now].y;
-        dx = point[next].x - point[now].x;
+        dy = points[next].y - points[now].y;
+        dx = points[next].x - points[now].x;
         duration = 3000;
         now = 0;
         next = 1;
         t = 0;
 
         while (t < duration) {
-            x = point[now].x + dx * t / duration;
-            y = point[now].y + dy * t / duration;
+            x = points[now].x + dx * t / duration;
+            y = points[now].y + dy * t / duration;
             t += 1 / frameRate;
             //x,yの場所にカメラを移動
             //カメラの作成
@@ -197,8 +197,8 @@ window.onload = function () {
         }
     } else if (keydownFlag === true) {
         //平行移動初期化
-        dy = point[next].y - point[now].y;
-        dx = point[next].x - point[now].x;
+        dy = points[next].y - points[now].y;
+        dx = points[next].x - points[now].x;
         duration = 3000;
         now = 0;
         next = 1;
