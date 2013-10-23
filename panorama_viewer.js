@@ -45,14 +45,16 @@ jQuery(document).ready(function () {
         });
     }).error(function () {
         alert("エラー");
+    }).next(function () {
         initPanorama();
     });
 });
 
+/*
 jQuery(window).load(function () {
 
-})
-
+});
+*/
 /* var initPanorama = function() {
     construct(texts); 
     view_construct(); 
