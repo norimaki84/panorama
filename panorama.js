@@ -131,100 +131,101 @@ var initPanorama = function () {
 
     scene.add(mesh01);
 
+    for (var i = 0; i < points.length[i]; i++) {
+        //移動先の物体生成
+        creategeometry = function () {
+            geometry02 = new THREE.SphereGeometry(
+                radius,
+                segmentsWidth,
+                segmentsHeight,
+                phiStart,
+                phiLength,
+                thetaStart,
+                thetaLength
+            );
+            material02 = new THREE.MeshBasicMaterial({
+                overdraw: true,
+                map: THREE.ImageUtils.loadTexture(points[2].img, new THREE.UVMapping(), function () {
+                    material02.side = THREE.BackSide;
+                    mesh02 = new THREE.Mesh(geometry02, material02);
 
-    //移動先の物体生成
-    creategeometry = function () {
-        geometry02 = new THREE.SphereGeometry(
-            radius,
-            segmentsWidth,
-            segmentsHeight,
-            phiStart,
-            phiLength,
-            thetaStart,
-            thetaLength
-        );
-        material02 = new THREE.MeshBasicMaterial({
-            overdraw: true,
-            map: THREE.ImageUtils.loadTexture(points[2].img, new THREE.UVMapping(), function () {
-                material02.side = THREE.BackSide;
-                mesh02 = new THREE.Mesh(geometry02, material02);
+                    mesh02.position.x = points[2].x;
+                    mesh02.position.y = points[2].y;
+                    //mesh02.position.z = point[next].z;
 
-                mesh02.position.x = points[2].x;
-                mesh02.position.y = points[2].y;
-                //mesh02.position.z = point[next].z;
+                    scene.add(mesh02);
+                    loadingFlag = false;
+                    moveFlag = true;
+                })
+            });
+        };
 
-                scene.add(mesh02);
-                loadingFlag = false;
-                moveFlag = true;
-            })
-        });
-    };
+        if (translateFlag === true) {
+            //移動処理
+            dy = points[next].y - points[now].y;
+            dx = points[next].x - points[now].x;
+            duration = 3000;
+            now = 0;
+            next = 1;
+            t = 0;
 
-    if (translateFlag === true) {
-        //移動処理
-        dy = points[next].y - points[now].y;
-        dx = points[next].x - points[now].x;
-        duration = 3000;
-        now = 0;
-        next = 1;
-        t = 0;
+            while (t < duration) {
+                x = points[now].x + dx * t / duration;
+                y = points[now].y + dy * t / duration;
+                t += 1 / frameRate;
+                //x,yの場所にカメラを移動
+                //カメラの作成
+                fov = 72;
+                // 画角１A アスペクト比１A
+                camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 10000);
 
-        while (t < duration) {
-            x = points[now].x + dx * t / duration;
-            y = points[now].y + dy * t / duration;
-            t += 1 / frameRate;
-            //x,yの場所にカメラを移動
-            //カメラの作成
-            fov = 72;
-            // 画角１A アスペクト比１A
-            camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 10000);
+                camera.position = new THREE.Vector3(x, y, 0);   //カメラの移動後の位置
+                camera.target = new THREE.Vector3(x, y, 0); //カメラの移動後の注視点
+                camera.lookAt(camera.target);
+                scene.add(camera);
+            }
+            if (t === duration) {
+                translateFlag = true;
+            }
+        } else if (rotateFlag === false) {
+            //回転移動処理
+            onDocumentMouseDown();
+            onDocumentMouseMove();
 
-            camera.position = new THREE.Vector3(x, y, 0);   //カメラの移動後の位置
-            camera.target = new THREE.Vector3(x, y, 0); //カメラの移動後の注視点
-            camera.lookAt(camera.target);
-            scene.add(camera);
+            if (onDocumentMouseUp === true) {
+                rotateFlag = false;
+            }
+        } else if (keydownFlag === true) {
+            //平行移動初期化
+            dy = points[next].y - points[now].y;
+            dx = points[next].x - points[now].x;
+            duration = 3000;
+            now = 0;
+            next = 1;
+            t = 0;
+
+            rotateFlag = true;
+        } else if (mouseDownFlag === true) {
+            //回転移動の初期化
+            rotateFlag = true;
         }
-        if (t === duration) {
-            translateFlag = true;
-        }
-    } else if (rotateFlag === false) {
-        //回転移動処理
-        onDocumentMouseDown();
-        onDocumentMouseMove();
 
-        if (onDocumentMouseUp === true) {
-            rotateFlag = false;
-        }
-    } else if (keydownFlag === true) {
-        //平行移動初期化
-        dy = points[next].y - points[now].y;
-        dx = points[next].x - points[now].x;
-        duration = 3000;
-        now = 0;
-        next = 1;
-        t = 0;
-
-        rotateFlag = true;
-    } else if (mouseDownFlag === true) {
-        //回転移動の初期化
-        rotateFlag = true;
-    }
-
-    //ポイント(カメラの位置、注視点)移動
-    document.onkeydown = function () {
-        if (keychar === "x") { //キーを押したとき
-            if (moveFlag === false && loadingFlag === false) {
-                if (create === true) {
-                    loadingFlag = true;
-                    //物体生成
-                    creategeometry();
-                    if (rightmoveFlag === true && leftmoveFlag === true) {
-                        loadingFlag = false;
-                        moveFlag = false;
+        //ポイント(カメラの位置、注視点)移動
+        document.onkeydown = function () {
+            if (keychar === "x") { //キーを押したとき
+                if (moveFlag === false && loadingFlag === false) {
+                    if (create === true) {
+                        loadingFlag = true;
+                        //物体生成
+                        creategeometry();
+                        if (rightmoveFlag === true && leftmoveFlag === true) {
+                            loadingFlag = false;
+                            moveFlag = false;
+                        }
                     }
                 }
             }
-        }
+        };
     };
 
     //レンダリング
