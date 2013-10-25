@@ -159,54 +159,63 @@ var initPanorama = function () {
         });
     };
 
-    if (translateFlag === true) {
-        //移動処理
-        dy = points[next].y - points[now].y;
-        dx = points[next].x - points[now].x;
-        duration = 3000;
-        now = 0;
-        next = 1;
-        t = 0;
 
-        while (t < duration) {
-            x = points[now].x + dx * t / duration;
-            y = points[now].y + dy * t / duration;
-            t += 1 / frameRate;
-            //x,yの場所にカメラを移動
-            //カメラの作成
-            fov = 72;
-            // 画角１A アスペクト比１A
-            camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 10000);
 
-            camera.position = new THREE.Vector3(x, y, 0);   //カメラの移動後の位置
-            camera.target = new THREE.Vector3(x, y, 0); //カメラの移動後の注視点
-            camera.lookAt(camera.target);
-            scene.add(camera);
+
+    //レンダリング
+
+    function render() {
+        requestAnimationFrame(render);
+
+        if (translateFlag === true) {
+            //移動処理
+            dy = points[next].y - points[now].y;
+            dx = points[next].x - points[now].x;
+            duration = 3000;
+            now = 0;
+            next = 1;
+            t = 0;
+
+            while (t < duration) {
+                x = points[now].x + dx * t / duration;
+                y = points[now].y + dy * t / duration;
+                t += 1 / frameRate;
+                //x,yの場所にカメラを移動
+                //カメラの作成
+                fov = 72;
+                // 画角１A アスペクト比１A
+                camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 10000);
+
+                camera.position = new THREE.Vector3(x, y, 0);   //カメラの移動後の位置
+                camera.target = new THREE.Vector3(x, y, 0); //カメラの移動後の注視点
+                camera.lookAt(camera.target);
+                scene.add(camera);
+            }
+            if (t === duration) {
+                translateFlag = true;
+            }
+        } else if (rotateFlag === false) {
+            //回転移動処理
+            onDocumentMouseDown();
+            onDocumentMouseMove();
+
+            if (onDocumentMouseUp === true) {
+                rotateFlag = false;
+            }
+        } else if (keydownFlag === true) {
+            //平行移動初期化
+            dy = points[next].y - points[now].y;
+            dx = points[next].x - points[now].x;
+            duration = 3000;
+            now = 0;
+            next = 1;
+            t = 0;
+
+            rotateFlag = true;
+        } else if (mouseDownFlag === true) {
+            //回転移動の初期化
+            rotateFlag = true;
         }
-        if (t === duration) {
-            translateFlag = true;
-        }
-    } else if (rotateFlag === false) {
-        //回転移動処理
-        onDocumentMouseDown();
-        onDocumentMouseMove();
-
-        if (onDocumentMouseUp === true) {
-            rotateFlag = false;
-        }
-    } else if (keydownFlag === true) {
-        //平行移動初期化
-        dy = points[next].y - points[now].y;
-        dx = points[next].x - points[now].x;
-        duration = 3000;
-        now = 0;
-        next = 1;
-        t = 0;
-
-        rotateFlag = true;
-    } else if (mouseDownFlag === true) {
-        //回転移動の初期化
-        rotateFlag = true;
     }
 
     //ポイント(カメラの位置、注視点)移動
@@ -226,13 +235,7 @@ var initPanorama = function () {
         }
     };
 
-
-    //レンダリング
-
-    function render() {
-        requestAnimationFrame(render);
-        renderer.render(scene, camera);
-    }
+    renderer.render(scene, camera);
 
     render();
 };
