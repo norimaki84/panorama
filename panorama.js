@@ -167,7 +167,7 @@ var createKeyEvent = function () {
     };
 };
 
-
+/*
 var createMouseEvent = function () {
     'use strict';
     var onPointerDownLon = 0,
@@ -228,18 +228,21 @@ var createMouseEvent = function () {
     window.addEventListener('mousemove', onDocumentMouseMove, false);
     window.addEventListener('mouseup', onDocumentMouseUp, false);
     window.addEventListener('resize', onWindowResize, false);
-};
+}; */
 
 var rotating = function () {
     'use strict';
-    console.log('rotating');
+
+    var controls = new THREE.OrbitControls(camera);
+    controls.center = new THREE.Vector3(0, 0, 0);
+
 };
 
 //レンダリング
 
 var render = function () {
     'use strict';
-    var t,
+    /*var t,
         x,
         y,
         dx,
@@ -251,8 +254,9 @@ var render = function () {
         mouseDownFlag = false,
         now,
         next,
-        fov;
+        fov;*/
     requestAnimationFrame(render);
+    controls.update();
     renderer.render(scene, camera);
 
 
@@ -305,7 +309,7 @@ var render = function () {
         //回転移動の初期化
         rotateFlag = true;
     } */
-    
+
 };
 
 var initPanorama = function () {
@@ -337,8 +341,9 @@ var initPanorama = function () {
     console.log('phase 8');
     createKeyEvent();
     console.log('phase 9');
-    createMouseEvent();
-
+    //createMouseEvent();
+    rotating();
+    console.log('phase 10');
 };
 
 
