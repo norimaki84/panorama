@@ -57,7 +57,7 @@ var createCamera = function () {
     // 画角１A アスペクト比１A
     camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 10000);
     //カメラ初期化
-    camera.position = new THREE.Vector3(0, 1, -1);//カメラの初期位置
+    camera.position = new THREE.Vector3(0, 0, 0);//カメラの初期位置
     camera.target = new THREE.Vector3(0, 0, 0);//カメラの注視点
     camera.lookAt(camera.target);
     scene.add(camera);
@@ -89,14 +89,14 @@ var createSourceObject = function () {
 
     material01 = new THREE.MeshBasicMaterial({
         overdraw: true,
-        map: THREE.ImageUtils.loadTexture(points[1].img)
+        map: THREE.ImageUtils.loadTexture(points[0].img)
     });
 
     material01.side = THREE.BackSide;
     mesh01 = new THREE.Mesh(geometry01, material01);
 
-    mesh01.position.x = points[1].x;
-    mesh01.position.y = points[1].y;
+    mesh01.position.x = points[0].x;
+    mesh01.position.y = points[0].y;
     //mesh01.position.z = point[start].z;
     console.log(mesh01.position.x);
     console.log(mesh01.position.y);
@@ -131,14 +131,14 @@ var createDestinationObject = function () {
 
     material02 = new THREE.MeshBasicMaterial({
         overdraw: true,
-        map: THREE.ImageUtils.loadTexture(points[2].img)
+        map: THREE.ImageUtils.loadTexture(points[1].img)
     });
 
     material02.side = THREE.BackSide;
     mesh02 = new THREE.Mesh(geometry02, material02);
 
-    mesh02.position.x = points[2].x;
-    mesh02.position.y = points[2].y;
+    mesh02.position.x = points[1].x;
+    mesh02.position.y = points[1].y;
     //mesh02.position.z = point[next].z;
 
     scene.add(mesh02);
@@ -239,7 +239,7 @@ var rotating = function () {
 
 var render = function () {
     'use strict';
-    /*var t,
+    var t,
         x,
         y,
         dx,
@@ -251,7 +251,7 @@ var render = function () {
         mouseDownFlag = false,
         now,
         next,
-        fov; */
+        fov;
     requestAnimationFrame(render);
     renderer.render(scene, camera);
 
@@ -304,8 +304,8 @@ var render = function () {
     } else if (mouseDownFlag === true) {
         //回転移動の初期化
         rotateFlag = true;
-    }
-*/
+    } */
+    
 };
 
 var initPanorama = function () {
@@ -340,3 +340,53 @@ var initPanorama = function () {
     createMouseEvent();
 
 };
+
+
+jQuery(document).ready(function () {
+    'use strict';
+
+    mapsFile = 'maps.json';
+    linksFile = 'links.json';
+    pointsFile = 'points.json';
+    dateFile = 'date.json';
+    modalsFile = 'modals.json';
+
+    Deferred.define();
+
+    next(function () {
+        return jQuery.getJSON(mapsFile, { format: 'json' }, function (json) {
+            maps = json;
+        });
+    }).error(function () {
+        window.alert("エラー");
+    }).next(function () {
+        return jQuery.getJSON(pointsFile, { format: 'json' }, function (json) {
+            points = json;
+        });
+    }).error(function () {
+        window.alert("エラー");
+    }).next(function () {
+        return jQuery.getJSON(linksFile, { format: 'json' }, function (json) {
+            links = json;
+        });
+    }).error(function () {
+        window.alert("エラー");
+    }).next(function () {
+        return jQuery.getJSON(dateFile, { format: 'json' }, function (json) {
+            date = json;
+        });
+    }).error(function () {
+        window.alert("エラー");
+    }).next(function () {
+        return jQuery.getJSON(mapsFile, { format: 'json' }, function (json) {
+            modals = json;
+        });
+    }).error(function () {
+        window.alert("エラー");
+    }).next(function () {
+        console.log('finish loading');
+        initPanorama();
+        render();
+    });
+});
+
