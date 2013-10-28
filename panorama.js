@@ -236,6 +236,8 @@ var rotating = function () {
     var controls = new THREE.OrbitControls(camera);
     controls.center = new THREE.Vector3(0, 0, 0);
 
+    controls.update();
+
 };
 
 //レンダリング
@@ -256,7 +258,7 @@ var render = function () {
         next,
         fov;*/
     requestAnimationFrame(render);
-    controls.update();
+
     renderer.render(scene, camera);
 
 
