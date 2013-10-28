@@ -5,9 +5,9 @@
         "details": "○○○",
         "initial_scene" : {"point" : "start", "direction" : "0"},
         "points": [
-            { "name":"start", "position":{ "x":"100", "y":"100"}},
-            { "name":"asasada", "position":{ "x":"100", "y":"200"}},
-            { "name":"dsfsdfs", "position":{ "x":"100", "y":"300"}}
+            { "name":"start", "position":{ "x":"0", "y":"0"}},
+            { "name":"asasada", "position":{ "x":"100", "y":"100"}},
+            { "name":"dsfsdfs", "position":{ "x":"200", "y":"100"}}
         ]
     }
 ]
