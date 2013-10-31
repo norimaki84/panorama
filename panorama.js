@@ -16,7 +16,10 @@ var maps, points, links, date, next, modals, mapsFile, linksFile, pointsFile, da
     leftMoveFlag,
     loadingFlag,
     create = true,
-    isUserInteracting = false;
+    isUserInteracting = false,
+    onmousedownFlag,
+    onmousemoveFlag,
+    onmouseupFlag;
 
 var detectSupportWebGL = function () {
     'use strict';
@@ -230,14 +233,57 @@ var createMouseEvent = function () {
     window.addEventListener('resize', onWindowResize, false);
 }; */
 
+var WindowResize = function () {
+    'use strict';
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
 var rotating = function () {
     'use strict';
+    
+    if (onmousedownFlag === true) {
+        var onPointerDownLon = 0,
+            onPointerDownLat = 0,
+            onPointerDownPointerX = 0,
+            onPointerDownPointerY = 0,
+            lon = 0,
+            lat = 0,
+            phi = 0,
+            theta = 0;
 
-    var controls = new THREE.OrbitControls(camera);
-    controls.center = new THREE.Vector3(0, 0, 0);
+        event.preventDefault();
+        isUserInteracting = true;
+        onPointerDownPointerX = event.clientX;
+        onPointerDownPointerY = event.clientY;
+        onPointerDownLon = lon;
+        onPointerDownLat = lat;
 
-    controls.update();
 
+        lat = Math.max(-85, Math.min(85, lat));
+        phi = (90 - lat) * Math.PI / 180;
+        theta = lon * Math.PI / 180;
+        camera.target.x = 500 * Math.sin(phi) * Math.cos(theta);
+        camera.target.y = 500 * Math.cos(phi);
+        camera.target.z = 500 * Math.sin(phi) * Math.sin(theta);
+        camera.lookAt(camera.target);
+    }else if (onmousemoveFlag === true) {
+        if (isUserInteracting) {
+            lon = (onPointerDownPointerX - event.clientX) * 0.1 + onPointerDownLon;
+            lat = (event.clientY - onPointerDownPointerY) * 0.1 + onPointerDownLat;
+        }
+
+        lat = Math.max(-85, Math.min(85, lat));
+        phi = (90 - lat) * Math.PI / 180;
+        theta = lon * Math.PI / 180;
+        camera.target.x = 500 * Math.sin(phi) * Math.cos(theta);
+        camera.target.y = 500 * Math.cos(phi);
+        camera.target.z = 500 * Math.sin(phi) * Math.sin(theta);
+        camera.lookAt(camera.target);
+    }else if(onmouseupFlag === true){
+        isUserInteracting = false;
+    }
 };
 
 //レンダリング
@@ -310,8 +356,8 @@ var render = function () {
     } else if (mouseDownFlag === true) {
         //回転移動の初期化
         rotateFlag = true;
-    } */
-
+    } 
+*/
 };
 
 var initPanorama = function () {
@@ -343,9 +389,12 @@ var initPanorama = function () {
     console.log('phase 8');
     createKeyEvent();
     console.log('phase 9');
+    WindowResize();
+    console.log('phase 10');
     //createMouseEvent();
     rotating();
-    console.log('phase 10');
+    console.log('phase 11');
+    uttonStatus();
 };
 
 
