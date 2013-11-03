@@ -233,26 +233,26 @@ var createMouseEvent = function () {
     window.addEventListener('resize', onWindowResize, false);
 }; */
 
-var WindowResize = function () {
+var windowresize = function () {
     'use strict';
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-}
+};
 
 var rotating = function () {
     'use strict';
-    
-    if (onmousedownFlag === true) {
-        var onPointerDownLon = 0,
-            onPointerDownLat = 0,
-            onPointerDownPointerX = 0,
-            onPointerDownPointerY = 0,
-            lon = 0,
-            lat = 0,
-            phi = 0,
-            theta = 0;
 
+    var onPointerDownLon = 0,
+        onPointerDownLat = 0,
+        onPointerDownPointerX = 0,
+        onPointerDownPointerY = 0,
+        lon = 0,
+        lat = 0,
+        phi = 0,
+        theta = 0;
+
+    if (onmousedownFlag === true) {
         event.preventDefault();
         isUserInteracting = true;
         onPointerDownPointerX = event.clientX;
@@ -268,7 +268,7 @@ var rotating = function () {
         camera.target.y = 500 * Math.cos(phi);
         camera.target.z = 500 * Math.sin(phi) * Math.sin(theta);
         camera.lookAt(camera.target);
-    }else if (onmousemoveFlag === true) {
+    } else if (onmousemoveFlag === true) {
         if (isUserInteracting) {
             lon = (onPointerDownPointerX - event.clientX) * 0.1 + onPointerDownLon;
             lat = (event.clientY - onPointerDownPointerY) * 0.1 + onPointerDownLat;
@@ -281,7 +281,7 @@ var rotating = function () {
         camera.target.y = 500 * Math.cos(phi);
         camera.target.z = 500 * Math.sin(phi) * Math.sin(theta);
         camera.lookAt(camera.target);
-    }else if(onmouseupFlag === true){
+    } else if (onmouseupFlag === true) {
         isUserInteracting = false;
     }
 };
@@ -389,12 +389,11 @@ var initPanorama = function () {
     console.log('phase 8');
     createKeyEvent();
     console.log('phase 9');
-    WindowResize();
+    windowresize();
     console.log('phase 10');
     //createMouseEvent();
     rotating();
     console.log('phase 11');
-    uttonStatus();
 };
 
 
