@@ -362,15 +362,6 @@ var render = function () {
 
 var initPanorama = function () {
     'use strict';
-/*
-    var renderer, ambient,
-        radius, segmentsWidth, segmentsHeight, phiStart, phiLength, thetaStart, thetaLength,
-        geometry01, material01, mesh01,
-        geometry02, material02, mesh02,
-        creategeometry,
-        loadingFlag, moveFlag, rightmoveFlag = false, leftmoveFlag = false,
-        create = false;
-*/
 
     console.log('phase 1');
     detectSupportWebGL();
