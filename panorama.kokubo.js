@@ -43,7 +43,7 @@ setCamera = function (i) {
     'use strict';
     var lookAt;
 
-    if (i !== undefined) {
+    if (arguments.length === 1) {
         console.log('index:' + i);
         index = i;
         camera.position = new THREE.Vector3(
