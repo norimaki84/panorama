@@ -1,27 +1,15 @@
 /*jslint browser:true */
 /*global Deferred, Detector, THREE, frameRate, keychar, requestAnimationFrame, jQuery, console */
+
 var maps, points, links, date, next, modals, mapsFile, linksFile, pointsFile, dateFile, modalsFile,
     renderer, scene, camera,
-    initPanorama,
-    detectSupportWebGL,
-    initRenderer,
-    createScene,
-    createLight,
-    createCamera,
-    createSourceObject,
-    createDestinationObject,
-    createKeyEvent,
-    moveFlag,
-    rightMoveFlag,
-    leftMoveFlag,
-    loadingFlag,
-    create = true,
-    isUserInteracting = false,
-    onmousedownFlag,
-    onmousemoveFlag,
-    onmouseupFlag;
+    initPanorama, detectSupportWebGL, initRenderer, createScene, createLight,
+    setCamera, createCamera, createSphere, addEvents, render,
+    isRotating = false,
+    isTranslating = false,
+    index = 0;
 
-var detectSupportWebGL = function () {
+detectSupportWebGL = function () {
     'use strict';
 
     if (!Detector.webgl) {
@@ -29,7 +17,7 @@ var detectSupportWebGL = function () {
     }
 };
 
-var initRenderer = function () {
+initRenderer = function () {
     'use strict';
     //レンダラの初期化
     renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -40,278 +28,294 @@ var initRenderer = function () {
     document.body.appendChild(renderer.domElement);
 };
 
-var createScene = function () {
+createScene = function () {
     'use strict';
     scene = new THREE.Scene();
 };
 
-var createLight = function () {
+createLight = function () {
     'use strict';
     var ambient = new THREE.AmbientLight(0xFFFFFF);
     scene.add(ambient);
 };
 
-var createCamera = function () {
+setCamera = function (i) {
+    'use strict';
+    var lookAt;
+
+    if (arguments.length === 1) {
+        console.log('index:' + i);
+        index = i;
+        camera.position = new THREE.Vector3(
+            parseInt(points[i].x, 10),
+            parseInt(points[i].y, 10),
+            parseInt(points[i].z, 10)
+        );
+    }
+
+    lookAt = new THREE.Vector3(
+        camera.position.x + camera.direction.x,
+        camera.position.y + camera.direction.y,
+        camera.position.z + camera.direction.z
+    );
+    // console.log(camera.position);
+    // console.log(camera.direction);
+    // console.log(lookAt);
+
+    camera.lookAt(lookAt);
+};
+
+createCamera = function () {
     'use strict';
     var fov;
 
     //カメラの作成
-    fov = 72;
+    fov = 50;
+
     // 画角１A アスペクト比１A
-    camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 10000);
     //カメラ初期化
-    camera.position = new THREE.Vector3(0, 0, 0);//カメラの初期位置
-    camera.target = new THREE.Vector3(0, 0, 0);//カメラの注視点
-    camera.lookAt(camera.target);
+    camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.direction = new THREE.Vector3(1, 0, 0);
+    // console.log(index);
+    setCamera(index);
     scene.add(camera);
 };
 
-var createSourceObject = function () {
+createSphere = function (index) {
     'use strict';
-    // 初期位置の物体の作成
-    var radius = 1,
-        segmentsWidth = 32,
-        segmentsHeight = 16,
+    // 物体の作成
+    var geometry, material, mesh,
+        url, mapping, onLoad, onError, map,
+        radius = 1,
+        widthSegments = 32,
+        heightSegments = 16,
         phiStart = 0,
         phiLength = 2 * Math.PI,
-        thetaStart = 1,
-        thetaLength = Math.PI - 2 * thetaStart,
-        geometry01,
-        material01,
-        mesh01;
+        thetaStart = 0,
+        thetaLength = Math.PI;
 
-    geometry01 = new THREE.SphereGeometry(
-        radius,
-        segmentsWidth,
-        segmentsHeight,
-        phiStart,
-        phiLength,
-        thetaStart,
-        thetaLength
-    );
+    url = points[index].img;
+    mapping = undefined;
 
-    material01 = new THREE.MeshBasicMaterial({
-        overdraw: true,
-        map: THREE.ImageUtils.loadTexture(points[0].img)
-    });
+    onLoad = function () {
+        // console.log('loading: ' + url);
+        // console.log('width: ' + map.image.width);
+        // console.log('height: ' + map.image.height);
 
-    material01.side = THREE.BackSide;
-    mesh01 = new THREE.Mesh(geometry01, material01);
-
-    mesh01.position.x = points[0].x;
-    mesh01.position.y = points[0].y;
-    //mesh01.position.z = point[start].z;
-    console.log(mesh01.position.x);
-    console.log(mesh01.position.y);
-    console.log(mesh01.position.z);
-
-    scene.add(mesh01);
-};
-
-var createDestinationObject = function () {
-    'use strict';
-    var radius = 1,
-        segmentsWidth = 32,
-        segmentsHeight = 16,
-        phiStart = 0,
-        phiLength = 2 * Math.PI,
-        thetaStart = 1,
-        thetaLength = Math.PI - 2 * thetaStart,
-        geometry02,
-        material02,
-        mesh02;
-
-    //移動先の物体生成
-    geometry02 = new THREE.SphereGeometry(
-        radius,
-        segmentsWidth,
-        segmentsHeight,
-        phiStart,
-        phiLength,
-        thetaStart,
-        thetaLength
-    );
-
-    material02 = new THREE.MeshBasicMaterial({
-        overdraw: true,
-        map: THREE.ImageUtils.loadTexture(points[1].img)
-    });
-
-    material02.side = THREE.BackSide;
-    mesh02 = new THREE.Mesh(geometry02, material02);
-
-    mesh02.position.x = points[1].x;
-    mesh02.position.y = points[1].y;
-    //mesh02.position.z = point[next].z;
-
-    scene.add(mesh02);
-
-};
-
-var createKeyEvent = function () {
-    'use strict';
-    //ポイント(カメラの位置、注視点)移動
-    document.onkeydown = function () {
-        if (keychar === "x") { //キーを押したとき
-            if (moveFlag === false && loadingFlag === false) {
-                if (create === true) {
-                    loadingFlag = true;
-                    //物体生成
-                    createDestinationObject();
-                    loadingFlag = false;
-                    moveFlag = true;
-                    if (rightMoveFlag === true && leftMoveFlag === true) {
-                        loadingFlag = false;
-                        moveFlag = false;
-                    }
-                }
-            }
+        thetaLength = 2 * map.image.height / map.image.width * Math.PI;
+        if (thetaLength > Math.PI) {
+            thetaLength = Math.PI;
         }
+
+        thetaStart = (Math.PI - thetaLength) / 2;
+
+        material = new THREE.MeshBasicMaterial({
+            overdraw: true,
+            map: map,
+            side: THREE.BackSide
+        });
+
+        geometry = new THREE.SphereGeometry(
+            radius,
+            widthSegments,
+            heightSegments,
+            phiStart,
+            phiLength,
+            thetaStart,
+            thetaLength
+        );
+
+        mesh = new THREE.Mesh(geometry, material);
+        mesh.position.x = parseInt(points[index].x, 10);
+        mesh.position.y = parseInt(points[index].y, 10);
+        mesh.position.z = parseInt(points[index].z, 10);
+
+        scene.add(mesh);
     };
+
+    onError = function () {
+        console.log('loading error: ' + url);
+    };
+
+    map = THREE.ImageUtils.loadTexture(url, mapping, onLoad, onError);
 };
 
-/*
-var createMouseEvent = function () {
+addEvents = function () {
     'use strict';
-    var onPointerDownLon = 0,
+    var isMoving, isTranslating, isRotating, tryTranslatingOn, tryRotatingtingOn,
+        resize, keyup, keydown, mouseup, mousedown, mousemove, blured, mouseWheel,
+        onPointerDownLon = 0,
         onPointerDownLat = 0,
         onPointerDownPointerX = 0,
         onPointerDownPointerY = 0,
         lon = 0,
         lat = 0;
 
-    function onDocumentMouseDown(event) {
-        var phi = 0,
-            theta = 0;
+    isRotating = false;
+    isTranslating = false;
 
-        event.preventDefault();
-        isUserInteracting = true;
-        onPointerDownPointerX = event.clientX;
-        onPointerDownPointerY = event.clientY;
-        onPointerDownLon = lon;
-        onPointerDownLat = lat;
-
-
-        lat = Math.max(-85, Math.min(85, lat));
-        phi = (90 - lat) * Math.PI / 180;
-        theta = lon * Math.PI / 180;
-        camera.target.x = 500 * Math.sin(phi) * Math.cos(theta);
-        camera.target.y = 500 * Math.cos(phi);
-        camera.target.z = 500 * Math.sin(phi) * Math.sin(theta);
-        camera.lookAt(camera.target);
-    }
-
-    function onDocumentMouseMove(event) {
-        var phi, theta;
-        if (isUserInteracting) {
-            lon = (onPointerDownPointerX - event.clientX) * 0.1 + onPointerDownLon;
-            lat = (event.clientY - onPointerDownPointerY) * 0.1 + onPointerDownLat;
+    isMoving = function () {
+        var result;
+        if (isRotating === true || isTranslating === true) {
+            result = true;
+        } else {
+            result = false;
         }
+        return result;
+    };
 
-        lat = Math.max(-85, Math.min(85, lat));
-        phi = (90 - lat) * Math.PI / 180;
-        theta = lon * Math.PI / 180;
-        camera.target.x = 500 * Math.sin(phi) * Math.cos(theta);
-        camera.target.y = 500 * Math.cos(phi);
-        camera.target.z = 500 * Math.sin(phi) * Math.sin(theta);
-        camera.lookAt(camera.target);
-    }
+    tryTranslatingOn = function () {
+        if (!isMoving()) {
+            isTranslating = true;
+        }
+    };
 
-    function onDocumentMouseUp() {
-        isUserInteracting = false;
-    }
+    tryRotatingtingOn = function () {
+        if (!isMoving()) {
+            isRotating = true;
+        }
+    };
 
-    function onWindowResize() {
+    resize = function () {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
-    }
+    };
 
-    window.addEventListener('mousedown', onDocumentMouseDown, false);
-    window.addEventListener('mousemove', onDocumentMouseMove, false);
-    window.addEventListener('mouseup', onDocumentMouseUp, false);
-    window.addEventListener('resize', onWindowResize, false);
-}; */
+    keyup = function () {
+        //event.preventDefault();
+        isTranslating = false;
+    };
 
-var windowresize = function () {
-    'use strict';
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-};
+    keydown = function (event) {
+        //event.preventDefault();
+        tryTranslatingOn();
+        if (isTranslating === true) {
+            switch (event.keyCode) {
+            case 37:
+                setCamera(0);
+                console.log('left');
+                break;
+            case 38:
+                setCamera(1);
+                console.log('forward');
+                break;
+            case 39:
+                setCamera(2);
+                console.log('right');
+                break;
+            case 40:
+                // console.log('backward');
+                break;
+            default:
+                console.log('other key');
+                break;
+            }
 
-var rotating = function () {
-    'use strict';
+        }
+    };
 
-    var onPointerDownLon = 0,
-        onPointerDownLat = 0,
-        onPointerDownPointerX = 0,
-        onPointerDownPointerY = 0,
-        lon = 0,
-        lat = 0,
-        phi = 0,
-        theta = 0;
-
-    if (onmousedownFlag === true) {
+    mouseup = function (event) {
         event.preventDefault();
-        isUserInteracting = true;
-        onPointerDownPointerX = event.clientX;
-        onPointerDownPointerY = event.clientY;
-        onPointerDownLon = lon;
-        onPointerDownLat = lat;
+        isRotating = false;
+    };
 
+    mousedown = function (event) {
+        var phi, theta;
+        event.preventDefault();
+        tryRotatingtingOn();
 
-        lat = Math.max(-85, Math.min(85, lat));
-        phi = (90 - lat) * Math.PI / 180;
-        theta = lon * Math.PI / 180;
-        camera.target.x = 500 * Math.sin(phi) * Math.cos(theta);
-        camera.target.y = 500 * Math.cos(phi);
-        camera.target.z = 500 * Math.sin(phi) * Math.sin(theta);
-        camera.lookAt(camera.target);
-    } else if (onmousemoveFlag === true) {
-        if (isUserInteracting) {
+        if (isRotating === true) {
+            onPointerDownPointerX = event.clientX;
+            onPointerDownPointerY = event.clientY;
+            onPointerDownLon = lon;
+            onPointerDownLat = lat;
+
+            lat = Math.max(-85, Math.min(85, lat));
+            phi = (90 - lat) * Math.PI / 180;
+            theta = lon * Math.PI / 180;
+            camera.direction.x = Math.sin(phi) * Math.cos(theta);
+            camera.direction.y = Math.cos(phi);
+            camera.direction.z = Math.sin(phi) * Math.sin(theta);
+            setCamera();
+        }
+    };
+
+    mousemove = function (event) {
+        var phi, theta;
+        event.preventDefault();
+        if (isRotating === true) {
             lon = (onPointerDownPointerX - event.clientX) * 0.1 + onPointerDownLon;
             lat = (event.clientY - onPointerDownPointerY) * 0.1 + onPointerDownLat;
+            lat = Math.max(-85, Math.min(85, lat));
+            phi = (90 - lat) * Math.PI / 180;
+            theta = lon * Math.PI / 180;
+            camera.direction.x = Math.sin(phi) * Math.cos(theta);
+            camera.direction.y = Math.cos(phi);
+            camera.direction.z = Math.sin(phi) * Math.sin(theta);
+            setCamera();
+        }
+    };
+
+    blured = function () {
+        isRotating = false;
+    };
+
+    mouseWheel = function (event) {
+        var fov, fovMin = 20, fovMax = 150;
+        fov = camera.fov;
+
+        // WebKit
+        if (event.wheelDeltaY) {
+            fov -= event.wheelDeltaY * 0.05;
+        // Opera / Explorer 9
+        } else if (event.wheelDelta) {
+            fov -= event.wheelDelta * 0.05;
+        // Firefox
+        } else if (event.detail) {
+            fov += event.detail;
         }
 
-        lat = Math.max(-85, Math.min(85, lat));
-        phi = (90 - lat) * Math.PI / 180;
-        theta = lon * Math.PI / 180;
-        camera.target.x = 500 * Math.sin(phi) * Math.cos(theta);
-        camera.target.y = 500 * Math.cos(phi);
-        camera.target.z = 500 * Math.sin(phi) * Math.sin(theta);
-        camera.lookAt(camera.target);
-    } else if (onmouseupFlag === true) {
-        isUserInteracting = false;
-    }
+        if (fov < fovMin) {
+            fov = fovMin;
+        }
+        if (fov > fovMax) {
+            fov = fovMax;
+        }
+
+        camera.fov = fov;
+        camera.updateProjectionMatrix();
+    };
+
+    jQuery(window).bind('resize', function (event) { resize(event); });
+    jQuery(window).bind('keyup', function (event) { keyup(event); });
+    jQuery(window).bind('keydown', function (event) { keydown(event); });
+    jQuery(window).bind('mousedown', function (event) { mousedown(event); });
+    jQuery(window).bind('mouseup', function (event) { mouseup(event); });
+    jQuery(window).bind('mousemove', function (event) { mousemove(event); });
+    jQuery(window).bind('blur', function (event) { blured(event); });
+    window.addEventListener('mousewheel', mouseWheel, false);
+    window.addEventListener('DOMMouseScroll', mouseWheel, false);
 };
 
 //レンダリング
 
-var render = function () {
+render = function () {
     'use strict';
-    /*var t,
-        x,
-        y,
-        dx,
-        dy,
-        duration,
-        translateFlag = false,
-        rotateFlag = false,
-        keydownFlag = false,
-        mouseDownFlag = false,
-        now,
-        next,
-        fov;*/
     requestAnimationFrame(render);
 
-    renderer.render(scene, camera);
+    var dz,
+        dx,
+        duration,
+        now,
+        next,
+        t,
+        x,
+        z;
 
-
-/*
-    if (translateFlag === true) {
+    if (isTranslating === true) {
         //移動処理
-        dy = points[next].y - points[now].y;
+        dz = points[next].z - points[now].z;
         dx = points[next].x - points[now].x;
         duration = 3000;
         now = 0;
@@ -320,71 +324,70 @@ var render = function () {
 
         while (t < duration) {
             x = points[now].x + dx * t / duration;
-            y = points[now].y + dy * t / duration;
+            z = points[now].z + dz * t / duration;
             t += 1 / frameRate;
             //x,yの場所にカメラを移動
             //カメラの作成
-            fov = 72;
-            // 画角１A アスペクト比１A
-            camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 10000);
-
-            camera.position = new THREE.Vector3(x, y, 0);   //カメラの移動後の位置
-            camera.target = new THREE.Vector3(x, y, 0); //カメラの移動後の注視点
-            camera.lookAt(camera.target);
-            scene.add(camera);
+            createCamera();
         }
         if (t === duration) {
-            translateFlag = true;
+            isTranslating = true;
         }
-    } else if (rotateFlag === true) {
+    } else if (isRotating === true) {
         //回転移動処理
-        rotating();
-
-        if (isUserInteracting === false) {
-            rotateFlag = false;
+        addEvents();
+        if (mouseup()){
+            isRotating = false;
         }
     } else if (keydownFlag === true) {
         //平行移動初期化
-        dy = points[next].y - points[now].y;
+        dz = points[next].z - points[now].z;
         dx = points[next].x - points[now].x;
         duration = 3000;
         now = 0;
         next = 1;
         t = 0;
 
-        rotateFlag = true;
-    } else if (mouseDownFlag === true) {
+        isRotating = true;
+    } else if (isRotating === true) {
         //回転移動の初期化
-        rotateFlag = true;
+        isRotating = true;
     } 
-*/
+
+    renderer.render(scene, camera);
 };
 
-var initPanorama = function () {
+initPanorama = function () {
     'use strict';
 
     console.log('phase 1');
     detectSupportWebGL();
+
     console.log('phase 2');
     initRenderer();
+
     console.log('phase 3');
     createScene();
+
     console.log('phase 4');
     createLight();
+
     console.log('phase 5');
     createCamera();
+
     console.log('phase 6');
-    createSourceObject();
+    createSphere(0);
+
     console.log('phase 7');
-    //createDestinationObject();
+    createSphere(1);
+
     console.log('phase 8');
-    createKeyEvent();
+    createSphere(2);
+
     console.log('phase 9');
-    windowresize();
+    addEvents();
+
     console.log('phase 10');
-    //createMouseEvent();
-    rotating();
-    console.log('phase 11');
 };
 
 
@@ -435,4 +438,3 @@ jQuery(document).ready(function () {
         render();
     });
 });
-
