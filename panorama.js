@@ -7,6 +7,7 @@ var maps, points, links, date, next, modals, mapsFile, linksFile, pointsFile, da
     setCamera, createCamera, createSphere, addEvents, render,
     isRotating = false,
     isTranslating = false,
+    isZooming = false,
     index = 0;
 
 detectSupportWebGL = function () {
@@ -190,71 +191,58 @@ addEvents = function () {
     keydown = function (event) {
         //event.preventDefault();
         tryTranslatingOn();
-        if (isTranslating === true) {
-            switch (event.keyCode) {
-            case 37:
-                setCamera(0);
-                console.log('left');
-                break;
-            case 38:
-                setCamera(1);
-                console.log('forward');
-                break;
-            case 39:
-                setCamera(2);
-                console.log('right');
-                break;
-            case 40:
-                // console.log('backward');
-                break;
-            default:
-                console.log('other key');
-                break;
-            }
+        switch (event.keyCode) {
+        case 37:
+            setCamera(0);
+            console.log('left');
+            break;
+        case 38:
+            setCamera(1);
+            console.log('forward');
+            break;
+        case 39:
+            setCamera(2);
+            console.log('right');
+            break;
+        case 40:
+            // console.log('backward');
+            break;
+        default:
+            console.log('other key');
+            break;
 
         }
     };
 
     mouseup = function (event) {
         event.preventDefault();
-        isRotating = false;
+        //isRotating = false;
     };
 
     mousedown = function (event) {
-        var phi, theta;
         event.preventDefault();
         tryRotatingtingOn();
 
-        if (isRotating === true) {
-            onPointerDownPointerX = event.clientX;
-            onPointerDownPointerY = event.clientY;
-            onPointerDownLon = lon;
-            onPointerDownLat = lat;
-
-            lat = Math.max(-85, Math.min(85, lat));
-            phi = (90 - lat) * Math.PI / 180;
-            theta = lon * Math.PI / 180;
-            camera.direction.x = Math.sin(phi) * Math.cos(theta);
-            camera.direction.y = Math.cos(phi);
-            camera.direction.z = Math.sin(phi) * Math.sin(theta);
-            setCamera();
-        }
+        onPointerDownPointerX = event.clientX;
+        onPointerDownPointerY = event.clientY;
+        onPointerDownLon = lon;
+        onPointerDownLat = lat;
     };
 
     mousemove = function (event) {
         var phi, theta;
         event.preventDefault();
-        if (isRotating === true) {
-            lon = (onPointerDownPointerX - event.clientX) * 0.1 + onPointerDownLon;
-            lat = (event.clientY - onPointerDownPointerY) * 0.1 + onPointerDownLat;
-            lat = Math.max(-85, Math.min(85, lat));
-            phi = (90 - lat) * Math.PI / 180;
-            theta = lon * Math.PI / 180;
-            camera.direction.x = Math.sin(phi) * Math.cos(theta);
-            camera.direction.y = Math.cos(phi);
-            camera.direction.z = Math.sin(phi) * Math.sin(theta);
-            setCamera();
-        }
+
+        lon = (onPointerDownPointerX - event.clientX) * 0.1 + onPointerDownLon;
+        lat = (event.clientY - onPointerDownPointerY) * 0.1 + onPointerDownLat;
+        lat = Math.max(-85, Math.min(85, lat));
+        phi = (90 - lat) * Math.PI / 180;
+        theta = lon * Math.PI / 180;
+        camera.direction.x = Math.sin(phi) * Math.cos(theta);
+        camera.direction.y = Math.cos(phi);
+        camera.direction.z = Math.sin(phi) * Math.sin(theta);
+        setCamera();
+
     };
 
     blured = function () {
@@ -303,6 +291,47 @@ addEvents = function () {
 render = function () {
     'use strict';
     requestAnimationFrame(render);
+
+    var duration = 3000, now = 0, next = 1, t = 0;
+
+    if (isRotating === true) {
+        onPointerDownLon = 0,
+        onPointerDownLat = 0,
+        onPointerDownPointerX = 0,
+        onPointerDownPointerY = 0,
+        lon = 0,
+        lat = 0,
+        phi,
+        theta;
+
+        //移動を取得
+        lat = Math.max(-85, Math.min(85, lat));
+        phi = (90 - lat) * Math.PI / 180;
+        theta = lon * Math.PI / 180;
+        // カメラの向きを計算
+        camera.direction.x = Math.sin(phi) * Math.cos(theta);
+        camera.direction.y = Math.cos(phi);
+        camera.direction.z = Math.sin(phi) * Math.sin(theta);
+        //カメラのパラメータを設定           
+        setCamera(); 
+    } else if (isZooming = true) {
+        mousewheel();
+        isRotating　= false;
+    } else if (isTranslating === true){
+        dx = points[next].x - points[now].x;
+        dz = points[next].z - points[now].z;
+
+        while (t < duration) {
+            //カメラの移動先の位置を計算
+            x = points[now].x + dx * t / duration;
+            z = points[now].z + dy * t / duration;
+            t += 1 / frameRate;
+            //x,yの場所にカメラを移動
+            //カメラの
+            setCamera(i);
+        }
+    }
+
     renderer.render(scene, camera);
 };
 
