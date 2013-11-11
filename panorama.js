@@ -303,57 +303,6 @@ addEvents = function () {
 render = function () {
     'use strict';
     requestAnimationFrame(render);
-
-    var dz,
-        dx,
-        duration,
-        now,
-        next,
-        t,
-        x,
-        z;
-
-    if (isTranslating === true) {
-        //移動処理
-        dz = points[next].z - points[now].z;
-        dx = points[next].x - points[now].x;
-        duration = 3000;
-        now = 0;
-        next = 1;
-        t = 0;
-
-        while (t < duration) {
-            x = points[now].x + dx * t / duration;
-            z = points[now].z + dz * t / duration;
-            t += 1 / frameRate;
-            //x,yの場所にカメラを移動
-            //カメラの作成
-            createCamera();
-        }
-        if (t === duration) {
-            isTranslating = true;
-        }
-    } else if (isRotating === true) {
-        //回転移動処理
-        addEvents();
-        if (mouseup()){
-            isRotating = false;
-        }
-    } else if (keydownFlag === true) {
-        //平行移動初期化
-        dz = points[next].z - points[now].z;
-        dx = points[next].x - points[now].x;
-        duration = 3000;
-        now = 0;
-        next = 1;
-        t = 0;
-
-        isRotating = true;
-    } else if (isRotating === true) {
-        //回転移動の初期化
-        isRotating = true;
-    } 
-
     renderer.render(scene, camera);
 };
 
