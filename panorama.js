@@ -292,17 +292,20 @@ render = function () {
     'use strict';
     requestAnimationFrame(render);
 
-    var duration = 3000, now = 0, next = 1, t = 0;
+    var lat = 0,
+        lon = 0,
+        phi,
+        theta,
+        duration = 3000,
+        now = 0,
+        next = 1,
+        t = 0,
+        dx = 0,
+        dz = 0,
+        x,
+        z;
 
     if (isRotating === true) {
-        onPointerDownLon = 0,
-        onPointerDownLat = 0,
-        onPointerDownPointerX = 0,
-        onPointerDownPointerY = 0,
-        lon = 0,
-        lat = 0,
-        phi,
-        theta;
 
         //移動を取得
         lat = Math.max(-85, Math.min(85, lat));
@@ -313,22 +316,23 @@ render = function () {
         camera.direction.y = Math.cos(phi);
         camera.direction.z = Math.sin(phi) * Math.sin(theta);
         //カメラのパラメータを設定           
-        setCamera(); 
-    } else if (isZooming = true) {
+        setCamera();
+    } else if (isZooming === true) {
+        //マウスホイールイベント
         mousewheel();
         isRotating　= false;
-    } else if (isTranslating === true){
+    } else if (isTranslating === true) {
         dx = points[next].x - points[now].x;
         dz = points[next].z - points[now].z;
 
         while (t < duration) {
             //カメラの移動先の位置を計算
             x = points[now].x + dx * t / duration;
-            z = points[now].z + dy * t / duration;
+            z = points[now].z + dz * t / duration;
             t += 1 / frameRate;
             //x,yの場所にカメラを移動
             //カメラの
-            setCamera(i);
+            setCamera();
         }
     }
 
