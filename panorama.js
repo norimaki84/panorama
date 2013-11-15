@@ -216,33 +216,37 @@ addEvents = function () {
 
     mouseup = function (event) {
         event.preventDefault();
-        //isRotating = false;
+        isRotating = false;
     };
 
     mousedown = function (event) {
         event.preventDefault();
         tryRotatingtingOn();
 
-        onPointerDownPointerX = event.clientX;
-        onPointerDownPointerY = event.clientY;
-        onPointerDownLon = lon;
-        onPointerDownLat = lat;
+        if (isRotating === true) {
+            onPointerDownPointerX = event.clientX;
+            onPointerDownPointerY = event.clientY;
+            onPointerDownLon = lon;
+            onPointerDownLat = lat;
+
+            setCamera();
+        }
     };
 
     mousemove = function (event) {
         var phi, theta;
         event.preventDefault();
-
-        lon = (onPointerDownPointerX - event.clientX) * 0.1 + onPointerDownLon;
-        lat = (event.clientY - onPointerDownPointerY) * 0.1 + onPointerDownLat;
-        lat = Math.max(-85, Math.min(85, lat));
-        phi = (90 - lat) * Math.PI / 180;
-        theta = lon * Math.PI / 180;
-        camera.direction.x = Math.sin(phi) * Math.cos(theta);
-        camera.direction.y = Math.cos(phi);
-        camera.direction.z = Math.sin(phi) * Math.sin(theta);
-        setCamera();
-
+        if (isRotating === true) {
+            lon = (onPointerDownPointerX - event.clientX) * 0.1 + onPointerDownLon;
+            lat = (event.clientY - onPointerDownPointerY) * 0.1 + onPointerDownLat;
+            lat = Math.max(-85, Math.min(85, lat));
+            phi = (90 - lat) * Math.PI / 180;
+            theta = lon * Math.PI / 180;
+            camera.direction.x = Math.sin(phi) * Math.cos(theta);
+            camera.direction.y = Math.cos(phi);
+            camera.direction.z = Math.sin(phi) * Math.sin(theta);
+            setCamera();
+        }
     };
 
     blured = function () {
@@ -292,46 +296,24 @@ render = function () {
     'use strict';
     requestAnimationFrame(render);
 
-    var lat = 0,
-        lon = 0,
-        phi,
-        theta,
-        duration = 3000,
+    var duration = 3000,
         now = 0,
         next = 1,
         t = 0,
         dx = 0,
-        dz = 0,
-        x,
-        z;
+        dz = 0;
 
-    if (isRotating === true) {
-
-        //移動を取得
-        lat = Math.max(-85, Math.min(85, lat));
-        phi = (90 - lat) * Math.PI / 180;
-        theta = lon * Math.PI / 180;
-        // カメラの向きを計算
-        camera.direction.x = Math.sin(phi) * Math.cos(theta);
-        camera.direction.y = Math.cos(phi);
-        camera.direction.z = Math.sin(phi) * Math.sin(theta);
-        //カメラのパラメータを設定           
-        setCamera();
-    } else if (isZooming === true) {
-        //マウスホイールイベント
-        mousewheel();
-        isRotating　= false;
-    } else if (isTranslating === true) {
+    //カメラ移動を計算
+    if (isTranslating === true) {
         dx = points[next].x - points[now].x;
         dz = points[next].z - points[now].z;
 
         while (t < duration) {
             //カメラの移動先の位置を計算
-            x = points[now].x + dx * t / duration;
-            z = points[now].z + dz * t / duration;
+            camera.position.x = points[now].x + dx * t / duration;
+            camera.position.z = points[now].z + dz * t / duration;
             t += 1 / frameRate;
             //x,yの場所にカメラを移動
-            //カメラの
             setCamera();
         }
     }
