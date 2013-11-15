@@ -8,6 +8,7 @@ var maps, points, links, date, next, modals, mapsFile, linksFile, pointsFile, da
     isRotating = false,
     isTranslating = false,
     isZooming = false,
+    direction,
     index = 0;
 
 detectSupportWebGL = function () {
@@ -193,7 +194,8 @@ addEvents = function () {
         tryTranslatingOn();
         switch (event.keyCode) {
         case 37:
-            setCamera(0);
+            isTranslating = true;
+            direction = 'left';
             console.log('left');
             break;
         case 38:
