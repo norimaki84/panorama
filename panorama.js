@@ -7,6 +7,7 @@ var maps, points, links, date, next, modals, mapsFile, linksFile, pointsFile, da
     setCamera, createCamera, createSphere, addEvents, render,
     isRotating = false,
     isTranslating = false,
+    t = 0,
     isZooming = false,
     direction,
     index = 0;
@@ -49,9 +50,9 @@ setCamera = function (i) {
         console.log('index:' + i);
         index = i;
         camera.position = new THREE.Vector3(
-            parseInt(points[i].x, 10),
-            parseInt(points[i].y, 10),
-            parseInt(points[i].z, 10)
+            parseFloat(points[i].x, 10),
+            parseFloat(points[i].y, 10),
+            parseFloat(points[i].z, 10)
         );
     }
 
@@ -128,9 +129,9 @@ createSphere = function (index) {
         );
 
         mesh = new THREE.Mesh(geometry, material);
-        mesh.position.x = parseInt(points[index].x, 10);
-        mesh.position.y = parseInt(points[index].y, 10);
-        mesh.position.z = parseInt(points[index].z, 10);
+        mesh.position.x = parseFloat(points[index].x, 10);
+        mesh.position.y = parseFloat(points[index].y, 10);
+        mesh.position.z = parseFloat(points[index].z, 10);
 
         scene.add(mesh);
     };
@@ -144,7 +145,8 @@ createSphere = function (index) {
 
 addEvents = function () {
     'use strict';
-    var isMoving, isTranslating, isRotating, tryTranslatingOn, tryRotatingtingOn,
+//    var isMoving, isTranslating, isRotating, tryTranslatingOn, tryRotatingtingOn,
+    var isMoving, tryTranslatingOn, tryRotatingtingOn,
         resize, keyup, keydown, mouseup, mousedown, mousemove, blured, mouseWheel,
         onPointerDownLon = 0,
         onPointerDownLat = 0,
@@ -153,8 +155,8 @@ addEvents = function () {
         lon = 0,
         lat = 0;
 
-    isRotating = false;
-    isTranslating = false;
+//    isRotating = false;
+//    isTranslating = false;
 
     isMoving = function () {
         var result;
@@ -169,6 +171,7 @@ addEvents = function () {
     tryTranslatingOn = function () {
         if (!isMoving()) {
             isTranslating = true;
+            t = 0;
         }
     };
 
@@ -186,15 +189,15 @@ addEvents = function () {
 
     keyup = function () {
         //event.preventDefault();
-        isTranslating = false;
+        //isTranslating = false;
     };
 
     keydown = function (event) {
         //event.preventDefault();
-        tryTranslatingOn();
         switch (event.keyCode) {
         case 37:
-            isTranslating = true;
+            //isTranslating = true;
+            tryTranslatingOn();
             direction = 'left';
             console.log('left');
             break;
@@ -301,25 +304,29 @@ render = function () {
     var duration = 3000,
         now = 0,
         next = 1,
-        t = 0,
+        //t = 0,
         dx = 0,
-        dz = 0;
+        dz = 0,
+        frameRate = 60;
 
+    //console.log('isTranslating=' + isTranslating);
     //カメラ移動を計算
     if (isTranslating === true) {
-        dx = points[next].x - points[now].x;
-        dz = points[next].z - points[now].z;
+        dx = parseFloat(points[next].x, 10) - parseFloat(points[now].x, 10);
+        dz = parseFloat(points[next].z, 10) - parseFloat(points[now].z, 10);
 
-        while (t < duration) {
+        if (t < duration) {
             //カメラの移動先の位置を計算
-            camera.position.x = points[now].x + dx * t / duration;
-            camera.position.z = points[now].z + dz * t / duration;
-            t += 1 / frameRate;
+            camera.position.x = parseFloat(points[now].x, 10) + dx * t / duration;
+            camera.position.z = parseFloat(points[now].z, 10) + dz * t / duration;
+            t += 1000 / frameRate;
             //x,yの場所にカメラを移動
             setCamera();
         }
     }
 
+    //console.log(t);
+    console.log("x=" + camera.position.x + ", z=" + camera.position.z);
     renderer.render(scene, camera);
 };
 

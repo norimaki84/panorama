@@ -7,6 +7,9 @@ var maps, points, links, date, next, modals, mapsFile, linksFile, pointsFile, da
     setCamera, createCamera, createSphere, addEvents, render,
     isRotating = false,
     isTranslating = false,
+    t = 0,
+    isZooming = false,
+    direction,
     index = 0;
 
 detectSupportWebGL = function () {
@@ -47,9 +50,9 @@ setCamera = function (i) {
         console.log('index:' + i);
         index = i;
         camera.position = new THREE.Vector3(
-            parseInt(points[i].x, 10),
-            parseInt(points[i].y, 10),
-            parseInt(points[i].z, 10)
+            parseFloat(points[i].x, 10),
+            parseFloat(points[i].y, 10),
+            parseFloat(points[i].z, 10)
         );
     }
 
@@ -126,9 +129,9 @@ createSphere = function (index) {
         );
 
         mesh = new THREE.Mesh(geometry, material);
-        mesh.position.x = parseInt(points[index].x, 10);
-        mesh.position.y = parseInt(points[index].y, 10);
-        mesh.position.z = parseInt(points[index].z, 10);
+        mesh.position.x = parseFloat(points[index].x, 10);
+        mesh.position.y = parseFloat(points[index].y, 10);
+        mesh.position.z = parseFloat(points[index].z, 10);
 
         scene.add(mesh);
     };
@@ -142,7 +145,8 @@ createSphere = function (index) {
 
 addEvents = function () {
     'use strict';
-    var isMoving, isTranslating, isRotating, tryTranslatingOn, tryRotatingtingOn,
+//    var isMoving, isTranslating, isRotating, tryTranslatingOn, tryRotatingtingOn,
+    var isMoving, tryTranslatingOn, tryRotatingtingOn,
         resize, keyup, keydown, mouseup, mousedown, mousemove, blured, mouseWheel,
         onPointerDownLon = 0,
         onPointerDownLat = 0,
@@ -151,8 +155,8 @@ addEvents = function () {
         lon = 0,
         lat = 0;
 
-    isRotating = false;
-    isTranslating = false;
+//    isRotating = false;
+//    isTranslating = false;
 
     isMoving = function () {
         var result;
@@ -167,6 +171,7 @@ addEvents = function () {
     tryTranslatingOn = function () {
         if (!isMoving()) {
             isTranslating = true;
+            t = 0;
         }
     };
 
@@ -184,33 +189,32 @@ addEvents = function () {
 
     keyup = function () {
         //event.preventDefault();
-        isTranslating = false;
+        //isTranslating = false;
     };
 
     keydown = function (event) {
         //event.preventDefault();
-        tryTranslatingOn();
-        if (isTranslating === true) {
-            switch (event.keyCode) {
-            case 37:
-                setCamera(0);
-                console.log('left');
-                break;
-            case 38:
-                setCamera(1);
-                console.log('forward');
-                break;
-            case 39:
-                setCamera(2);
-                console.log('right');
-                break;
-            case 40:
-                // console.log('backward');
-                break;
-            default:
-                console.log('other key');
-                break;
-            }
+        switch (event.keyCode) {
+        case 37:
+            //isTranslating = true;
+            tryTranslatingOn();
+            direction = 'left';
+            console.log('left');
+            break;
+        case 38:
+            setCamera(1);
+            console.log('forward');
+            break;
+        case 39:
+            setCamera(2);
+            console.log('right');
+            break;
+        case 40:
+            // console.log('backward');
+            break;
+        default:
+            console.log('other key');
+            break;
 
         }
     };
@@ -221,7 +225,6 @@ addEvents = function () {
     };
 
     mousedown = function (event) {
-        var phi, theta;
         event.preventDefault();
         tryRotatingtingOn();
 
@@ -231,12 +234,6 @@ addEvents = function () {
             onPointerDownLon = lon;
             onPointerDownLat = lat;
 
-            lat = Math.max(-85, Math.min(85, lat));
-            phi = (90 - lat) * Math.PI / 180;
-            theta = lon * Math.PI / 180;
-            camera.direction.x = Math.sin(phi) * Math.cos(theta);
-            camera.direction.y = Math.cos(phi);
-            camera.direction.z = Math.sin(phi) * Math.sin(theta);
             setCamera();
         }
     };
@@ -303,6 +300,33 @@ addEvents = function () {
 render = function () {
     'use strict';
     requestAnimationFrame(render);
+
+    var duration = 3000,
+        now = 0,
+        next = 1,
+        //t = 0,
+        dx = 0,
+        dz = 0,
+        frameRate = 60;
+
+    //console.log('isTranslating=' + isTranslating);
+    //カメラ移動を計算
+    if (isTranslating === true) {
+        dx = parseFloat(points[next].x, 10) - parseFloat(points[now].x, 10);
+        dz = parseFloat(points[next].z, 10) - parseFloat(points[now].z, 10);
+
+        if (t < duration) {
+            //カメラの移動先の位置を計算
+            camera.position.x = parseFloat(points[now].x, 10) + dx * t / duration;
+            camera.position.z = parseFloat(points[now].z, 10) + dz * t / duration;
+            t += 1000 / frameRate;
+            //x,yの場所にカメラを移動
+            setCamera();
+        }
+    }
+
+    //console.log(t);
+    console.log("x=" + camera.position.x + ", z=" + camera.position.z);
     renderer.render(scene, camera);
 };
 
@@ -387,4 +411,3 @@ jQuery(document).ready(function () {
         render();
     });
 });
-
