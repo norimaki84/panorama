@@ -5,6 +5,7 @@ var maps, points, links, date, next, modals, mapsFile, linksFile, pointsFile, da
     renderer, scene, camera,
     initPanorama, detectSupportWebGL, initRenderer, createScene, createLight,
     setCamera, createCamera, createSphere, addEvents, render,
+    t = 0,
     isRotating = false,
     isTranslating = false,
     isZooming = false,
@@ -78,7 +79,7 @@ createCamera = function () {
     //カメラ初期化
     camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.direction = new THREE.Vector3(1, 0, 0);
-    // console.log(index);
+    console.log(index);
     setCamera(index);
     scene.add(camera);
 };
@@ -153,8 +154,8 @@ addEvents = function () {
         lon = 0,
         lat = 0;
 
-    isRotating = false;
-    isTranslating = false;
+    //isRotating = false;
+    //isTranslating = false;
 
     isMoving = function () {
         var result;
@@ -301,20 +302,20 @@ render = function () {
     var duration = 3000,
         now = 0,
         next = 1,
-        t = 0,
         dx = 0,
-        dz = 0;
+        dz = 0,
+        frameRate = 60;
 
     //カメラ移動を計算
     if (isTranslating === true) {
-        dx = points[next].x - points[now].x;
-        dz = points[next].z - points[now].z;
+        dx = parseInt(points[next].x, 10) - parseInt(points[now].x, 10);
+        dz = parseInt(points[next].z, 10) - parseInt(points[now].z, 10);
 
-        while (t < duration) {
+        if (t < duration) {
             //カメラの移動先の位置を計算
-            camera.position.x = points[now].x + dx * t / duration;
-            camera.position.z = points[now].z + dz * t / duration;
-            t += 1 / frameRate;
+            camera.position.x = parseInt(points[now].x, 10) + dx * t / duration;
+            camera.position.z = parseInt(points[now].z, 10) + dz * t / duration;
+            t += 1000 / frameRate;
             //x,yの場所にカメラを移動
             setCamera();
         }
