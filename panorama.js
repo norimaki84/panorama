@@ -5,9 +5,9 @@ var maps, points, links, date, next, modals, mapsFile, linksFile, pointsFile, da
     renderer, scene, camera,
     initPanorama, detectSupportWebGL, initRenderer, createScene, createLight,
     setCamera, createCamera, createSphere, addEvents, render,
-    t = 0,
     isRotating = false,
     isTranslating = false,
+    t = 0,
     isZooming = false,
     direction,
     index = 0;
@@ -50,9 +50,9 @@ setCamera = function (i) {
         console.log('index:' + i);
         index = i;
         camera.position = new THREE.Vector3(
-            parseInt(points[i].x, 10),
-            parseInt(points[i].y, 10),
-            parseInt(points[i].z, 10)
+            parseFloat(points[i].x, 10),
+            parseFloat(points[i].y, 10),
+            parseFloat(points[i].z, 10)
         );
     }
 
@@ -79,7 +79,7 @@ createCamera = function () {
     //カメラ初期化
     camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.direction = new THREE.Vector3(1, 0, 0);
-    console.log(index);
+    // console.log(index);
     setCamera(index);
     scene.add(camera);
 };
@@ -129,9 +129,9 @@ createSphere = function (index) {
         );
 
         mesh = new THREE.Mesh(geometry, material);
-        mesh.position.x = parseInt(points[index].x, 10);
-        mesh.position.y = parseInt(points[index].y, 10);
-        mesh.position.z = parseInt(points[index].z, 10);
+        mesh.position.x = parseFloat(points[index].x, 10);
+        mesh.position.y = parseFloat(points[index].y, 10);
+        mesh.position.z = parseFloat(points[index].z, 10);
 
         scene.add(mesh);
     };
@@ -145,7 +145,8 @@ createSphere = function (index) {
 
 addEvents = function () {
     'use strict';
-    var isMoving, isTranslating, isRotating, tryTranslatingOn, tryRotatingtingOn,
+//    var isMoving, isTranslating, isRotating, tryTranslatingOn, tryRotatingtingOn,
+    var isMoving, tryTranslatingOn, tryRotatingtingOn,
         resize, keyup, keydown, mouseup, mousedown, mousemove, blured, mouseWheel,
         onPointerDownLon = 0,
         onPointerDownLat = 0,
@@ -154,8 +155,8 @@ addEvents = function () {
         lon = 0,
         lat = 0;
 
-    //isRotating = false;
-    //isTranslating = false;
+//    isRotating = false;
+//    isTranslating = false;
 
     isMoving = function () {
         var result;
@@ -170,6 +171,7 @@ addEvents = function () {
     tryTranslatingOn = function () {
         if (!isMoving()) {
             isTranslating = true;
+            t = 0;
         }
     };
 
@@ -187,15 +189,15 @@ addEvents = function () {
 
     keyup = function () {
         //event.preventDefault();
-        isTranslating = false;
+        //isTranslating = false;
     };
 
     keydown = function (event) {
         //event.preventDefault();
-        tryTranslatingOn();
         switch (event.keyCode) {
         case 37:
-            isTranslating = true;
+            //isTranslating = true;
+            tryTranslatingOn();
             direction = 'left';
             console.log('left');
             break;
@@ -302,25 +304,29 @@ render = function () {
     var duration = 3000,
         now = 0,
         next = 1,
+        //t = 0,
         dx = 0,
         dz = 0,
         frameRate = 60;
 
+    //console.log('isTranslating=' + isTranslating);
     //カメラ移動を計算
     if (isTranslating === true) {
-        dx = parseInt(points[next].x, 10) - parseInt(points[now].x, 10);
-        dz = parseInt(points[next].z, 10) - parseInt(points[now].z, 10);
+        dx = parseFloat(points[next].x, 10) - parseFloat(points[now].x, 10);
+        dz = parseFloat(points[next].z, 10) - parseFloat(points[now].z, 10);
 
         if (t < duration) {
             //カメラの移動先の位置を計算
-            camera.position.x = parseInt(points[now].x, 10) + dx * t / duration;
-            camera.position.z = parseInt(points[now].z, 10) + dz * t / duration;
+            camera.position.x = parseFloat(points[now].x, 10) + dx * t / duration;
+            camera.position.z = parseFloat(points[now].z, 10) + dz * t / duration;
             t += 1000 / frameRate;
             //x,yの場所にカメラを移動
             setCamera();
         }
     }
 
+    //console.log(t);
+    console.log("x=" + camera.position.x + ", z=" + camera.position.z);
     renderer.render(scene, camera);
 };
 
