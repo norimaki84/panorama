@@ -10,7 +10,8 @@ var maps, points, links, date, next, modals, mapsFile, linksFile, pointsFile, da
     t = 0,
     isZooming = false,
     direction,
-    index = 0;
+    index = 0,
+    material, curentMaterial, nextMaterial;
 
 detectSupportWebGL = function () {
     'use strict';
@@ -112,11 +113,15 @@ createSphere = function (index) {
 
         thetaStart = (Math.PI - thetaLength) / 2;
 
+        curentMaterial = material;
         material = new THREE.MeshBasicMaterial({
             overdraw: true,
+            //opacity: 0.3,
+            //transparent: true,
             map: map,
             side: THREE.BackSide
         });
+        nextMaterial = material;
 
         geometry = new THREE.SphereGeometry(
             radius,
@@ -188,7 +193,7 @@ addEvents = function () {
     };
 
     keyup = function () {
-        //event.preventDefault();
+        event.preventDefault();
         //isTranslating = false;
     };
 
@@ -307,7 +312,8 @@ render = function () {
         //t = 0,
         dx = 0,
         dz = 0,
-        frameRate = 60;
+        frameRate = 60,
+        i;
 
     //console.log('isTranslating=' + isTranslating);
     //カメラ移動を計算
@@ -321,6 +327,12 @@ render = function () {
             camera.position.z = parseFloat(points[now].z, 10) + dz * t / duration;
             t += 1000 / frameRate;
             //x,yの場所にカメラを移動
+            for (i = 0; i <= 1.0; i++) {
+                material.transparent = true;
+                curentMaterial.opacity += 0.3;
+                nextMaterial.opacity -= 0.3;
+            }
+
             setCamera();
         }
     }
