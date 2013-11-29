@@ -21,6 +21,19 @@ function initialize () {
         new google.maps.LatLng(35.681382, 139,766084);
         "<strong>東京駅</strong>"
     );
+    /*
+    // マーカーアイコンを変更
+    var markerImage = new google.maps.MarkerImage(
+        // 画像の場所
+        "imeags/○○.jpg",
+        // マーカーのサイズ
+        new google.maps.Size(20, 24),
+        // 画像の基準位置
+        new google.maps.Point(0, 0),
+        // Anchorポイント
+        new google.maps.Point(10, 24)
+    );
+*/
 }
 
 function createMarker (map, latlng, msg) {
