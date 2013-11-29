@@ -4,7 +4,8 @@
 var map; //マップ
 
 //マップオブジェクトを作成
-function initialize () {
+function initialize() {
+    'use strict';
     //地図を表示
     var latlng = new google.maps.LatLng(35.681382, 139.766084);
     var mapOpts = {
@@ -37,6 +38,7 @@ function initialize () {
 }
 
 function createMarker (map, latlng, msg) {
+    'use strict';
     //マーカーを作成
     var marker = new google.maps.Marker();
     marker.setpositon(latlng);
