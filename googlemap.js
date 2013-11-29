@@ -23,4 +23,20 @@ function initialize () {
     );
 }
 
-function createMarker ()
+function createMarker (map, latlng, msg) {
+    //マーカーを作成
+    var marker = new google.maps.Marker();
+    marker.setpositon(latlng);
+    marker.setmap(map);
+
+    //情報ウィンドウを作成
+    var infoWnd = new google.maps.InfoWindow();
+    infoWnd.setContent(msg);
+
+    //マーカーがクリックされたら、情報ウインドウを表示
+    google.maps.event.addListener(marker, "click", function  () {
+        infoWnd.open(map, marker);
+    });
+    return marker;
+    window.onload = initialize;
+}
