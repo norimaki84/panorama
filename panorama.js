@@ -7,6 +7,8 @@ var maps, points, links, date, next, modals, mapsFile, linksFile, pointsFile, da
     setCamera, createCamera, createSphere, addEvents, render,
     isRotating = false,
     isTranslating = false,
+    duration,
+    tick = duration,
     t = 0,
     isZooming = false,
     direction,
@@ -114,6 +116,7 @@ createSphere = function (index) {
         thetaStart = (Math.PI - thetaLength) / 2;
 
         curentMaterial = material;
+
         material = new THREE.MeshBasicMaterial({
             overdraw: true,
             //opacity: 0.3,
@@ -121,6 +124,7 @@ createSphere = function (index) {
             map: map,
             side: THREE.BackSide
         });
+
         nextMaterial = material;
 
         geometry = new THREE.SphereGeometry(
@@ -312,8 +316,7 @@ render = function () {
         //t = 0,
         dx = 0,
         dz = 0,
-        frameRate = 60,
-        i;
+        frameRate = 60;
 
     //console.log('isTranslating=' + isTranslating);
     //カメラ移動を計算
@@ -327,10 +330,10 @@ render = function () {
             camera.position.z = parseFloat(points[now].z, 10) + dz * t / duration;
             t += 1000 / frameRate;
             //x,yの場所にカメラを移動
-            for (i = 0; i <= 1.0; i++) {
-                material.transparent = true;
-                curentMaterial.opacity += 0.3;
-                nextMaterial.opacity -= 0.3;
+            if (tick < duration) {
+                nextMaterial.opacity = tick / duration;
+                curentMaterial.opacity = 1 - nextMaterial.opacity;
+                tick += 1;
             }
 
             setCamera();
