@@ -120,11 +120,12 @@ createSphere = function (index) {
         material = new THREE.MeshBasicMaterial({
             overdraw: true,
             //opacity: 0.3,
-            //transparent: true,
+            transparent: true,
             map: map,
             side: THREE.BackSide
         });
 
+        //nextMaterial.opacity = 0;
         nextMaterial = material;
 
         geometry = new THREE.SphereGeometry(
@@ -181,12 +182,16 @@ addEvents = function () {
         if (!isMoving()) {
             isTranslating = true;
             t = 0;
+            curentMaterial.opacity = 1;
+            nextMaterial.opacity = 0;
         }
     };
 
     tryRotatingtingOn = function () {
         if (!isMoving()) {
             isRotating = true;
+            curentMaterial.opacity = 1;
+            nextMaterial.opacity = 0;
         }
     };
 
@@ -319,6 +324,7 @@ render = function () {
         frameRate = 60;
 
     //console.log('isTranslating=' + isTranslating);
+    console.log("nextMaterial.opacity=" + nextMaterial.opacity);
     //カメラ移動を計算
     if (isTranslating === true) {
         dx = parseFloat(points[next].x, 10) - parseFloat(points[now].x, 10);
@@ -329,6 +335,7 @@ render = function () {
             camera.position.x = parseFloat(points[now].x, 10) + dx * t / duration;
             camera.position.z = parseFloat(points[now].z, 10) + dz * t / duration;
             t += 1000 / frameRate;
+
             //x,yの場所にカメラを移動
             if (tick < duration) {
                 nextMaterial.opacity = tick / duration;
