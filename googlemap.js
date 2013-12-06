@@ -1,5 +1,5 @@
 /*jslint browser:true */
-/*global Deferred, Detector, THREE, frameRate, keychar, requestAnimationFrame, jQuery, console */
+/*global google, Deferred, Detector, THREE, frameRate, keychar, requestAnimationFrame, jQuery, console */
 
 var map; //マップ
 
@@ -7,7 +7,7 @@ var map; //マップ
 function initialize() {
     'use strict';
 
-    var latlng, mapOpts, mapDiv, mapCanvas, mTokyoSt;
+    var latlng, mapOpts, mapDiv, mapCanvas, mTokyoSt, createMarker;
 
     //地図を表示
     latlng = new google.maps.LatLng(35.681382, 139.766084);
@@ -23,7 +23,7 @@ function initialize() {
     mTokyoSt = createMarker(
         mapCanvas,
         new google.maps.LatLng(35.681382, 13.766084);
-        "<strong>東京駅</strong>"
+        '<strong>東京駅</strong>'
     );
     /*
     // マーカーアイコンを変更
