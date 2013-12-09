@@ -1,0 +1,5 @@
+[
+    { "x" : "0.8", "y" : "0", "z" : "0", "img" : "images/0.JPG",  "ID" : "start"    },
+    { "x" : "-0.8", "y" : "0", "z" : "0", "img" : "images/1.jpg",  "ID" : "asasada"  },
+    { "x" : "2", "y" : "0", "z" : "2", "img" : "images/2.jpg",  "ID" : "fdsfsdfs" }
+]

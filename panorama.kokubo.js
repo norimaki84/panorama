@@ -7,10 +7,13 @@ var maps, points, links, date, next, modals, mapsFile, linksFile, pointsFile, da
     setCamera, createCamera, createSphere, addEvents, render,
     isRotating = false,
     isTranslating = false,
+    duration,
+    tick = duration,
     t = 0,
     isZooming = false,
     direction,
-    index = 0;
+    index = 0,
+    material, currentMesh, nextMesh;
 
 detectSupportWebGL = function () {
     'use strict';
@@ -114,9 +117,12 @@ createSphere = function (index) {
 
         material = new THREE.MeshBasicMaterial({
             overdraw: true,
+            //opacity: 0.3,
+            transparent: true,
             map: map,
-            side: THREE.BackSide
+            side: THREE.DoubleSide
         });
+
 
         geometry = new THREE.SphereGeometry(
             radius,
@@ -128,10 +134,15 @@ createSphere = function (index) {
             thetaLength
         );
 
+
         mesh = new THREE.Mesh(geometry, material);
         mesh.position.x = parseFloat(points[index].x, 10);
         mesh.position.y = parseFloat(points[index].y, 10);
         mesh.position.z = parseFloat(points[index].z, 10);
+        currentMesh = nextMesh;
+        nextMesh = mesh;
+
+        console.log(mesh);
 
         scene.add(mesh);
     };
@@ -172,6 +183,8 @@ addEvents = function () {
         if (!isMoving()) {
             isTranslating = true;
             t = 0;
+            //currentMesh.material.opacity = 1;
+            nextMesh.material.opacity = 0;
         }
     };
 
@@ -188,7 +201,7 @@ addEvents = function () {
     };
 
     keyup = function () {
-        //event.preventDefault();
+        event.preventDefault();
         //isTranslating = false;
     };
 
@@ -310,6 +323,8 @@ render = function () {
         frameRate = 60;
 
     //console.log('isTranslating=' + isTranslating);
+    //console.log("currentMaterial.opacity=" + currentMaterial.opacity);
+    //console.log("nextMaterial.opacity=" + nextMaterial.opacity);
     //カメラ移動を計算
     if (isTranslating === true) {
         dx = parseFloat(points[next].x, 10) - parseFloat(points[now].x, 10);
@@ -319,14 +334,52 @@ render = function () {
             //カメラの移動先の位置を計算
             camera.position.x = parseFloat(points[now].x, 10) + dx * t / duration;
             camera.position.z = parseFloat(points[now].z, 10) + dz * t / duration;
-            t += 1000 / frameRate;
+
+/*
+            camera.direction.x = -1;
+            camera.direction.y = 0;
+            camera.direction.z = 0;
+*/
+            camera.position.x = 4;
+            camera.position.z = 4;
+            camera.position.y = 5;
+            camera.direction.x = -camera.position.x;
+            camera.direction.y = -camera.position.y;
+            camera.direction.z = -camera.position.z;
+            console.log(points[now]);
+            console.log(points[next]);
+
+            console.log('t:' + t);
+            //console.log("nextMaterial.opacity=" + nextMaterial.opacity);
+            console.log('opacity:' + (t/duration));
+            nextMesh.material.transparent = true;
+            currentMesh.material.transparent = true;
+            var opacity = t / duration;
+            if (opacity > 1) {
+                opacity = 1;
+            } else if (opacity < 0) {
+                opacity = 0;
+            }
+            nextMesh.material.opacity = opacity;
+            currentMesh.material.opacity = 1 - opacity;
+/*
             //x,yの場所にカメラを移動
+            if (tick < duration) {
+                nextMesh.material.opacity = tick / duration;
+                currentMesh.material.opacity = 1 - nextMesh.material.opacity;
+                console.log('opacity:' + currentMesh.material.opacity);
+                tick += 1;
+            }
+*/
             setCamera();
+            t += 1000 / frameRate;
+        } else {
+            isTranslating = false;
         }
+        console.log("x=" + camera.position.x + ", z=" + camera.position.z);
     }
 
     //console.log(t);
-    console.log("x=" + camera.position.x + ", z=" + camera.position.z);
     renderer.render(scene, camera);
 };
 
@@ -355,7 +408,7 @@ initPanorama = function () {
     createSphere(1);
 
     console.log('phase 8');
-    createSphere(2);
+    //createSphere(2);
 
     console.log('phase 9');
     addEvents();
