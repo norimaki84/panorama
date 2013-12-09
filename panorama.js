@@ -13,7 +13,7 @@ var maps, points, links, date, next, modals, mapsFile, linksFile, pointsFile, da
     isZooming = false,
     direction,
     index = 0,
-    material, curentMaterial, nextMaterial;
+    material, curentMesh, nextMesh;
 
 detectSupportWebGL = function () {
     'use strict';
@@ -115,8 +115,6 @@ createSphere = function (index) {
 
         thetaStart = (Math.PI - thetaLength) / 2;
 
-        curentMaterial = material;
-
         material = new THREE.MeshBasicMaterial({
             overdraw: true,
             //opacity: 0.3,
@@ -125,8 +123,6 @@ createSphere = function (index) {
             side: THREE.BackSide
         });
 
-        //nextMaterial.opacity = 0;
-        nextMaterial = material;
 
         geometry = new THREE.SphereGeometry(
             radius,
@@ -138,10 +134,16 @@ createSphere = function (index) {
             thetaLength
         );
 
+        curentMesh = mesh;
+
         mesh = new THREE.Mesh(geometry, material);
         mesh.position.x = parseFloat(points[index].x, 10);
         mesh.position.y = parseFloat(points[index].y, 10);
         mesh.position.z = parseFloat(points[index].z, 10);
+
+        nextMesh = curentMesh;
+
+        console.log(mesh);
 
         scene.add(mesh);
     };
@@ -182,16 +184,14 @@ addEvents = function () {
         if (!isMoving()) {
             isTranslating = true;
             t = 0;
-            curentMaterial.opacity = 1;
-            nextMaterial.opacity = 0;
+            //curentMesh.material.opacity = 1;
+            nextMesh.material.opacity = 0;
         }
     };
 
     tryRotatingtingOn = function () {
         if (!isMoving()) {
             isRotating = true;
-            curentMaterial.opacity = 1;
-            nextMaterial.opacity = 0;
         }
     };
 
@@ -325,7 +325,7 @@ render = function () {
 
     //console.log('isTranslating=' + isTranslating);
     //console.log("curentMaterial.opacity=" + curentMaterial.opacity);
-    console.log("nextMaterial.opacity=" + nextMaterial.opacity);
+    //console.log("nextMaterial.opacity=" + nextMaterial.opacity);
     //カメラ移動を計算
     if (isTranslating === true) {
         dx = parseFloat(points[next].x, 10) - parseFloat(points[now].x, 10);
@@ -337,10 +337,12 @@ render = function () {
             camera.position.z = parseFloat(points[now].z, 10) + dz * t / duration;
             t += 1000 / frameRate;
 
+            //console.log("nextMaterial.opacity=" + nextMaterial.opacity);
+
             //x,yの場所にカメラを移動
             if (tick < duration) {
-                nextMaterial.opacity = tick / duration;
-                curentMaterial.opacity = 1 - nextMaterial.opacity;
+                nextMesh.material.opacity = tick / duration;
+                curentMesh.material.opacity = 1 - nextMesh.material.opacity;
                 tick += 1;
             }
 
