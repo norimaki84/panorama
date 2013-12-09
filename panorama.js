@@ -324,6 +324,7 @@ render = function () {
         frameRate = 60;
 
     //console.log('isTranslating=' + isTranslating);
+    //console.log("curentMaterial.opacity=" + curentMaterial.opacity);
     console.log("nextMaterial.opacity=" + nextMaterial.opacity);
     //カメラ移動を計算
     if (isTranslating === true) {
