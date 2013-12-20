@@ -340,6 +340,7 @@ render = function () {
             camera.direction.y = 0;
             camera.direction.z = 0;
 */
+/*
             camera.position.x = 4;
             camera.position.z = 4;
             camera.position.y = 5;
@@ -348,7 +349,7 @@ render = function () {
             camera.direction.z = -camera.position.z;
             console.log(points[now]);
             console.log(points[next]);
-
+*/
             console.log('t:' + t);
             //console.log("nextMaterial.opacity=" + nextMaterial.opacity);
             console.log('opacity:' + (t/duration));
