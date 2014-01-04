@@ -4,7 +4,7 @@
 var maps, points, links, date, next, modals, mapsFile, linksFile, pointsFile, dateFile, modalsFile,
     renderer, scene, camera,
     initPanorama, detectSupportWebGL, initRenderer, createScene, createLight,
-    setCamera, createCamera, createSphere, addEvents, render,
+    setCamera, createCamera, initCreateSphere, nextCreateSphere, addEvents, render,
     isRotating = false,
     isTranslating = false,
     duration,
@@ -87,7 +87,8 @@ createCamera = function () {
     scene.add(camera);
 };
 
-createSphere = function (index) {
+//移動元の球体
+initCreateSphere = function (index) {
     'use strict';
     // 物体の作成
     var geometry, material, mesh,
@@ -136,9 +137,77 @@ createSphere = function (index) {
 
 
         mesh = new THREE.Mesh(geometry, material);
-        mesh.position.x = parseFloat(points[index].x, 10);
-        mesh.position.y = parseFloat(points[index].y, 10);
-        mesh.position.z = parseFloat(points[index].z, 10);
+        mesh.position.x = parseFloat(points[1].x, 10);
+        mesh.position.y = parseFloat(points[1].y, 10);
+        mesh.position.z = parseFloat(points[1].z, 10);
+        currentMesh = mesh;
+        //nextMesh = mesh;
+
+        console.log(mesh);
+
+        scene.add(mesh);
+    };
+
+    onError = function () {
+        console.log('loading error: ' + url);
+    };
+
+    map = THREE.ImageUtils.loadTexture(url, mapping, onLoad, onError);
+};
+
+//移動先の球体
+nextCreateSphere = function (index) {
+    'use strict';
+    // 物体の作成
+    var geometry, material, mesh,
+        url, mapping, onLoad, onError, map,
+        radius = 3,
+        widthSegments = 64,
+        heightSegments = 32,
+        phiStart = 0,
+        phiLength = 2 * Math.PI,
+        thetaStart = 0,
+        thetaLength = Math.PI;
+
+    url = points[index].img;
+    mapping = undefined;
+
+    onLoad = function () {
+        // console.log('loading: ' + url);
+        // console.log('width: ' + map.image.width);
+        // console.log('height: ' + map.image.height);
+
+        thetaLength = 2 * map.image.height / map.image.width * Math.PI;
+        if (thetaLength > Math.PI) {
+            thetaLength = Math.PI;
+        }
+
+        thetaStart = (Math.PI - thetaLength) / 2;
+
+        material = new THREE.MeshBasicMaterial({
+            overdraw: true,
+            //opacity: 0.3,
+            transparent: true,
+            map: map,
+            side: THREE.DoubleSide
+        });
+
+
+        geometry = new THREE.SphereGeometry(
+            radius,
+            widthSegments,
+            heightSegments,
+            phiStart,
+            phiLength,
+            thetaStart,
+            thetaLength
+        );
+
+
+        mesh = new THREE.Mesh(geometry, material);
+        mesh.position.x = parseFloat(points[2].x, 10);
+        mesh.position.y = parseFloat(points[2].y, 10);
+        mesh.position.z = parseFloat(points[2].z, 10);
         currentMesh = nextMesh;
         nextMesh = mesh;
 
@@ -182,9 +251,7 @@ addEvents = function () {
     tryTranslatingOn = function () {
         if (!isMoving()) {
             isTranslating = true;
-            t = 0;
-            //currentMesh.material.opacity = 1;
-            nextMesh.material.opacity = 0;
+            nextCreateSphere();
         }
     };
 
@@ -315,45 +382,27 @@ render = function () {
     requestAnimationFrame(render);
 
     var duration = 3000,
-        now = 0,
-        next = 1,
-        //t = 0,
+        //now = 0,
+        //next = 1,
         dx = 0,
         dz = 0,
         frameRate = 60;
 
-    //console.log('isTranslating=' + isTranslating);
-    //console.log("currentMaterial.opacity=" + currentMaterial.opacity);
-    //console.log("nextMaterial.opacity=" + nextMaterial.opacity);
-    //カメラ移動を計算
+    //移動先の球体を生成
     if (isTranslating === true) {
-        dx = parseFloat(points[next].x, 10) - parseFloat(points[now].x, 10);
-        dz = parseFloat(points[next].z, 10) - parseFloat(points[now].z, 10);
+        //移動先の球体を生成
+        nextCreateSphere();
 
         if (t < duration) {
-            //カメラの移動先の位置を計算
-            camera.position.x = parseFloat(points[now].x, 10) + dx * t / duration;
-            camera.position.z = parseFloat(points[now].z, 10) + dz * t / duration;
+            //移動先の球体の位置を計算し、初期球体の位置に移動
+            nextCreateSphere.mesh.position.x = parseFloat(points[1].x, 10) + dx * t / duration;
+            nextCreateSphere.mesh.position.z = parseFloat(points[1].z, 10) + dz * t / duration;
 
-/*
-            camera.direction.x = -1;
-            camera.direction.y = 0;
-            camera.direction.z = 0;
-*/
-/*
-            camera.position.x = 4;
-            camera.position.z = 4;
-            camera.position.y = 5;
-            camera.direction.x = -camera.position.x;
-            camera.direction.y = -camera.position.y;
-            camera.direction.z = -camera.position.z;
-            console.log(points[now]);
-            console.log(points[next]);
-*/
             console.log('t:' + t);
             //console.log("nextMaterial.opacity=" + nextMaterial.opacity);
-            console.log('opacity:' + (t/duration));
-            nextMesh.material.transparent = true;
+            //console.log('opacity:' + (t/duration));
+
+            //移動元のopacityを薄くする
             currentMesh.material.transparent = true;
             var opacity = t / duration;
             if (opacity > 1) {
@@ -361,21 +410,19 @@ render = function () {
             } else if (opacity < 0) {
                 opacity = 0;
             }
-            nextMesh.material.opacity = opacity;
             currentMesh.material.opacity = 1 - opacity;
-/*
-            //x,yの場所にカメラを移動
-            if (tick < duration) {
-                nextMesh.material.opacity = tick / duration;
-                currentMesh.material.opacity = 1 - nextMesh.material.opacity;
-                console.log('opacity:' + currentMesh.material.opacity);
-                tick += 1;
-            }
-*/
+
             setCamera();
             t += 1000 / frameRate;
         } else {
             isTranslating = false;
+            //移動元の球体を消す
+            initCreateSphere() = none;
+
+            //移動先の球体の大きさを移動元の球体の大きさにする
+            nextCreateSphere.radius = initCreateSphere.radius;
+            nextCreateSphere.widthSegments = initCreateSphere.widthSegments;
+            nextCreateSphere.heightSegments = initCreateSphere.heightSegments;
         }
         console.log("x=" + camera.position.x + ", z=" + camera.position.z);
     }
@@ -403,10 +450,10 @@ initPanorama = function () {
     createCamera();
 
     console.log('phase 6');
-    createSphere(0);
+    initCreateSphere();
 
     console.log('phase 7');
-    createSphere(1);
+    //createSphere(1);
 
     console.log('phase 8');
     //createSphere(2);
