@@ -15,7 +15,7 @@ var renderer, scene, camera, currentMesh, nextMesh, nextMeshInitialPosition,
     // debug = "birdview", // デバッグ表示: カメラを鳥瞰に
     // パラメータ
     lat, lon,
-    duration = 60 * 5,
+    duration = 60 * 1,
     tick = 0;
 
 // WebGLへの対応のチェック
@@ -89,7 +89,7 @@ createMesh = function (order, index) {
     }
 
     url = points[index].img;
-    phiStart = parseFloat(points[index].phiStart, 10);
+    phiStart = (parseFloat(points[index].phiStart, 10) - 180) / 360 * 2 * Math.PI;
     mapping = undefined;
 
     onLoad = function () {
@@ -430,7 +430,7 @@ render = function () {
     // デバッグ時のカメラの設定
     if (debug === "birdview") {
         // 鳥瞰モード
-        camera.position = new THREE.Vector3(5, 5, 5);
+        camera.position = new THREE.Vector3(-5, 10, -5);
         camera.lookAt(new THREE.Vector3(0, 0, 0));
     } else if (debug === "centerview") {
         // 中心表示モード
