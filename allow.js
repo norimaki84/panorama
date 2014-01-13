@@ -14,9 +14,9 @@ mesh02.position = new THREE.Vector3(0, 0, -0.3);
 var cube02 = mesh02;
 
 var camera   = new THREE.PerspectiveCamera(40, width / height, 1, 1000); // カメラ作成。画角40、距離1〜1000の部分を表示できる。
-camera.position.x = 0;
-camera.position.y = 5;
-camera.position.z = 0;
+camera.position.x = 3;
+camera.position.y = 3;
+camera.position.z = 3;
 camera.lookAt(new THREE.Vector3(0, 0, 0)); 
 
 var scene    = new THREE.Scene(); // シーン作成
