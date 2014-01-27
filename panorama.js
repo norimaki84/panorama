@@ -69,6 +69,36 @@ removeMesh = function (mesh) {
     scene.remove(mesh);
 };
 
+//リンク先ポインタ表示(矢印)
+createAllow = function(index){
+    'use strict';
+
+    var geometry01 = new THREE.CubeGeometry(0.3, 0.2, 0.9); // 立方体作成01
+    var material01 = new THREE.MeshBasicMaterial({color: 0x0000aa}); // 材質作成
+    var mesh01     = new THREE.Mesh(geometry01, material01); // 立方体01と材質を結びつけてメッシュ作成
+    mesh01.position = new THREE.Vector3(-0.3, 0, 0);
+    var cube01 = mesh01;
+
+    var geometry02 = new THREE.CubeGeometry(0.9, 0.2, 0.3); // 立方体作成02
+    var material02 = new THREE.MeshBasicMaterial({color: 0x0000aa}); // 材質作成
+    var mesh02     = new THREE.Mesh(geometry02, material02); // 立方体02と材質を結びつけてメッシュ作成
+    mesh02.position = new THREE.Vector3(0, 0, -0.3);
+    var cube02 = mesh02;
+
+    var scene    = new THREE.Scene(); // シーン作成
+    var group = new THREE.Object3D();
+    group.add(cube01);
+    group.add(cube02);
+
+    scene.add(group); // シーンにメッシュ追加
+};
+
+//リンク先ポインタ削除
+removeAllow = function (allow) {
+    'use strict';
+    scene.remove(allow);
+};
+
 // メッシュの生成
 createMesh = function (order, index) {
     'use strict';
@@ -138,6 +168,10 @@ createMesh = function (order, index) {
             setNextMeshPosition(index);
             isLoading = 'finished';
         }
+
+        //起動時のリンク先ポインタを生成
+        createAllow();
+
         scene.add(mesh);
     };
 
@@ -399,6 +433,9 @@ render = function () {
         tick += 1;
 
         if (tick >= duration) {
+            //リンク先ポインタを削除
+            removeAllow();
+
             // メッシュを削除
             removeMesh(currentMesh);
             removeMesh(nextMesh);
@@ -424,6 +461,10 @@ render = function () {
 
             // 次のメッシュの位置をずらす
             nextMesh.position = nextMeshPosition.multiplyScalar(1 - ratio);
+
+            //リンク先ポインタを新たに生成
+            createAllow();  
+
         }
     }
 
