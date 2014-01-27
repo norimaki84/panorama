@@ -1,4 +1,5 @@
 [
-    { "from": "start", "to": "asasada"},
-    { "from": "asasada", "to": "fdsfsdfs"}
+    { "from": "test01", "to": "test02"},
+    { "from": "test02", "to": "test03"},
+    { "from": "test03", "to": "test01"},
 ]
