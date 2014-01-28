@@ -398,6 +398,43 @@ initRealityWalker = function () {
             }
         };
 
+        //マウスクリックの取得(リンク先ポインタをクリックした時)
+        mouseclick = function (event){
+            var projector = new THREE.Projector();
+
+            if (ev.target == renderer.domElement) { 
+
+                //マウス座標2D変換
+                var rect = ev.target.getBoundingClientRect();    
+                mouse.x =  ev.clientX - rect.left;
+                mouse.y =  ev.clientY - rect.top;
+                
+                //マウス座標3D変換 width（横）やheight（縦）は画面サイズ
+                mouse.x =  (mouse.x / width) * 2 - 1;           
+                mouse.y = -(mouse.y / height) * 2 + 1;
+                
+                // マウスベクトル
+                var vector = new THREE.Vector3( mouse.x, mouse.y ,1);
+
+               // vector はスクリーン座標系なので, オブジェクトの座標系に変換
+                projector.unprojectVector( vector, camera );
+
+                // 始点, 向きベクトルを渡してレイを作成
+                var ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+                
+                 // クリック判定
+                var obj = ray.intersectObjects( targetList );
+                
+                 // クリックしていたら、alertを表示  
+                if ( obj.length > 0 ){                       
+                  
+                  alert("click!!")
+                  
+                } 
+
+            }
+        }; 
+
         // イベントハンドラの登録
         jQuery(window).bind('resize',    function (event) { resize(event); });
         jQuery(window).bind('keyup',     function (event) { keyup(event); });
