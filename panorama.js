@@ -70,7 +70,7 @@ removeMesh = function (mesh) {
 };
 
 //リンク先ポインタ表示(矢印)
-createAllow = function(index){
+createArrow = function(index){
     'use strict';
 
     var geometry01, geometry02,
@@ -104,7 +104,7 @@ createAllow = function(index){
 };
 
 //リンク先ポインタ削除
-removeAllow = function (allow) {
+removeArrow = function (allow) {
     'use strict';
     scene.remove(allow);
 };
@@ -180,7 +180,7 @@ createMesh = function (order, index) {
         }
 
         //起動時のリンク先ポインタを生成
-        createAllow();
+        createArrow();
 
         scene.add(mesh);
     };
@@ -481,7 +481,7 @@ render = function () {
 
         if (tick >= duration) {
             //リンク先ポインタを削除
-            removeAllow();
+            removeArrow();
 
             // メッシュを削除
             removeMesh(currentMesh);
@@ -510,7 +510,7 @@ render = function () {
             nextMesh.position = nextMeshPosition.multiplyScalar(1 - ratio);
 
             //リンク先ポインタを新たに生成
-            createAllow();  
+            createArrow();  
 
         }
     }
