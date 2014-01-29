@@ -25,6 +25,7 @@ group.add(cube01);
 group.add(cube02);
 
 group.position = new THREE.Vector3(0.8, -0.4, 0.8);
+group.rotation.set(0, Math.PI, 0);
 
 scene.add(group); // シーンにメッシュ追加
 
