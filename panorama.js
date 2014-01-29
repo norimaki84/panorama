@@ -92,7 +92,7 @@ createAllow = function(index){
     mesh02.position = new THREE.Vector3(0, 0, -0.3);
     cube02 = mesh02;
 
-    scene    = new THREE.Scene(); // シーン作成
+    scene = new THREE.Scene(); // シーン作成
     group = new THREE.Object3D();
     group.add(cube01);
     group.add(cube02);
