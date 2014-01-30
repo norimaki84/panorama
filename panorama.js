@@ -110,39 +110,46 @@ removeArrow = function (allow) {
     scene.remove(allow);
 };
 
+getAngle = function (srcIndex, destIndex) {
+    var srcLat, srcLng, srcLatLng, destLat, destLng, destLatLng;
+    srcLat = parseFloat(points[srcIndex].lat, 10);
+    srcLng = parseFloat(points[srcIndex].lng, 10);
+    srcLatLng = new google.maps.LatLng(srcLat, srcLng);
+    destLat = parseFloat(points[destIndex].lat, 10);
+    destLat = parseFloat(points[destIndex].lng, 10);
+    destLatLng = new google.maps.LatLng(destLat, destLng);
+    return google.maps.geometry.spherical.computeHeading(srcLatLng, destLatLng);
+}
+
 createArrows = function(){
     'use strict'
 
-    var angle;
+    var index, i, dest, angle, j;
 
-    //リンク先を全て調べる
-    // from -> toのリンク
-    if(isPoint(from.links,from.links)){
-        scenes[from.links][from.points].links.forward　= { links: to.map, points: to.point, direction: from.direction };
-        scenes[from.map][from.point][to.direction].link.backward　= { map: to.map, point: to.point, direction: to.direction };
-    } else {
-        console.log("map:"+from.map);
-        console.log("point:"+from.point);
-        console.log("direction:"+from.direction);
-        alert("不正なリンクがあります。コンソールをチェックしてください。")
+    index = currentMesh.index;
+    id = points[index].id;
+
+    for (i = 0; i < links.length; i += 1) {
+        if (links[i].from === id) {
+            dest = links[i].to;
+            for (j = 0; j < points.length; j += 1) {
+                if (points[j].id === dest) {
+                    angle = getAngle(index, j);
+                    createArrow(angle);
+                    break;                    
+                }
+            }
+        } else if (links[i].to === id) {
+            dest = links[i].from;
+            for (j = 0; j < points.length; j += 1) {
+                if (points[j].id === dest) {
+                    angle = getAngle(index, j);
+                    createArrow(angle);
+                    break;                    
+                }
+            }
+        }
     }
-
-    // to -> fromのリンク（改善:上と一緒）
-    if(isPoint(to.map,to.point)){
-        scenes[to.map][to.point][to.direction].link.forward = { map: from.map, point: from.point, direction: to.direction };
-        scenes[to.map][to.point][from.direction].link.backward = { map: from.map, point: from.point, direction: from.direction };
-    } else {
-        console.log("map:"+to.map);
-        console.log("point:"+to.point);
-        console.log("direction:"+to.direction);
-        alert("不正なリンクがあります。コンソールをチェックしてください。")
-    }
-
-    d =  google.maps.geometry.spherical.computeDistanceBetween(, )//2点間の距離
-    angle = -Math.sin(())
-
-    createArrow(angle);
-
 
 }
 
@@ -209,15 +216,13 @@ createMesh = function (order, index) {
         if (order === 'current') {
             mesh.name = 'current';
             currentMesh = mesh;
+            createArrow();
         } else if (order === 'next') {
             mesh.name = 'next';
             nextMesh = mesh;
             setNextMeshPosition(index);
             isLoading = 'finished';
         }
-
-        //起動時のリンク先ポインタを生成
-        createArrow();
 
         scene.add(mesh);
     };
@@ -533,6 +538,9 @@ render = function () {
 
             scene.add(currentMesh);
 
+            //リンク先ポインタを新たに生成
+            createArrow();
+
             isTranslating = false;
         } else {
             ratio = tick / duration;
@@ -545,10 +553,6 @@ render = function () {
 
             // 次のメッシュの位置をずらす
             nextMesh.position = nextMeshPosition.multiplyScalar(1 - ratio);
-
-            //リンク先ポインタを新たに生成
-            createArrow();  
-
         }
     }
 
