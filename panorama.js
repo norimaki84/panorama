@@ -1,11 +1,14 @@
 /*jslint browser:true, devel:true */
-/*global Deferred, next, Detector, THREE, requestAnimationFrame, jQuery */
+/*global Deferred, next, Detector, THREE, requestAnimationFrame, jQuery, google */
 
 var renderer, scene, camera, currentMesh, nextMesh, nextMeshInitialPosition,
     // データ
     maps, points, links, date, modals,
     // メソッド
     detectSupportWebGL, createMesh, setNextMeshPosition, removeMesh, initRealityWalker, render,
+    createArrow, removeArrow, getAngle, createArrows,
+    //オブシェクトを格納
+    targetList = [],
     // フラグ
     isRotating = false,
     isTranslating = false,
@@ -15,7 +18,7 @@ var renderer, scene, camera, currentMesh, nextMesh, nextMeshInitialPosition,
     // debug = "birdview", // デバッグ表示: カメラを鳥瞰に
     // パラメータ
     lat, lon,
-    duration = 60 * 1,
+    duration = 60,
     tick = 0;
 
 // WebGLへの対応のチェック
@@ -70,7 +73,7 @@ removeMesh = function (mesh) {
 };
 
 //リンク先ポインタ表示(矢印)
-createArrow = function(angle){
+createArrow = function (angle) {
     'use strict';
 
     var geometry01, geometry02,
@@ -98,8 +101,8 @@ createArrow = function(angle){
     group.add(cube01);
     group.add(cube02);
 
-    group.position = new THREE.Vector3(r*Math.cos(angle/180*Math.PI), -0.2, r*Math.sin(angle/180*Math.PI));　//ポインタの座標
-    group.rotation.set(0, (225-angle)/180, 0); //ｙ軸を中心に180度か移転
+    group.position = new THREE.Vector3(r * Math.cos(angle / 180 * Math.PI), -0.2, r * Math.sin(angle / 180 * Math.PI));　//ポインタの座標
+    group.rotation.set(0, (225 - angle) / 180, 0); //ｙ軸を中心に180度か移転
 
     scene.add(group); // シーンにメッシュ追加
 };
@@ -111,17 +114,24 @@ removeArrow = function (allow) {
 };
 
 getAngle = function (srcIndex, destIndex) {
-    var srcLat, srcLng, srcLatLng, destLat, destLng, destLatLng;
+    'use strict';
+
+    var srcLat, srcLng, srcLatLng,
+        destLat,　destLng,
+        destLatLng;
+
     srcLat = parseFloat(points[srcIndex].lat, 10);
     srcLng = parseFloat(points[srcIndex].lng, 10);
     srcLatLng = new google.maps.LatLng(srcLat, srcLng);
+
     destLat = parseFloat(points[destIndex].lat, 10);
     destLat = parseFloat(points[destIndex].lng, 10);
     destLatLng = new google.maps.LatLng(destLat, destLng);
+
     return google.maps.geometry.spherical.computeHeading(srcLatLng, destLatLng);
 }
 
-createArrows = function(){
+createArrows = function()　{
     'use strict'
 
     var index, i, dest, angle, j;
