@@ -70,7 +70,7 @@ removeMesh = function (mesh) {
 };
 
 //リンク先ポインタ表示(矢印)
-createArrow = function(index){
+createArrow = function(angle){
     'use strict';
 
     var geometry01, geometry02,
@@ -78,6 +78,7 @@ createArrow = function(index){
         mesh01, mesh02,
         cube01, cube02,
         scene,
+        r = 0.8,
         group;
 
     geometry01 = new THREE.CubeGeometry(0.03, 0.02, 0.09); // 立方体作成01
@@ -97,8 +98,8 @@ createArrow = function(index){
     group.add(cube01);
     group.add(cube02);
 
-    group.position = new THREE.Vector3(0.8, -0.4, 0.8);　//ポインタの座標
-    group.rotation.set(0, Math.PI, 0); //ｙ軸を中心に180度か移転
+    group.position = new THREE.Vector3(r*Math.cos(angle/180*Math.PI), -0.2, r*Math.sin(angle/180*Math.PI));　//ポインタの座標
+    group.rotation.set(0, (225-angle)/180, 0); //ｙ軸を中心に180度か移転
 
     scene.add(group); // シーンにメッシュ追加
 };
@@ -108,6 +109,13 @@ removeArrow = function (allow) {
     'use strict';
     scene.remove(allow);
 };
+
+createArrows = function(){
+    //リンク先を全て調べる
+    
+        createArrow(angle);
+
+}
 
 // メッシュの生成
 createMesh = function (order, index) {
