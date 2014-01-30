@@ -111,9 +111,38 @@ removeArrow = function (allow) {
 };
 
 createArrows = function(){
+    'use strict'
+
+    var angle;
+
     //リンク先を全て調べる
-    
-        createArrow(angle);
+    // from -> toのリンク
+    if(isPoint(from.links,from.links)){
+        scenes[from.links][from.points].links.forward　= { links: to.map, points: to.point, direction: from.direction };
+        scenes[from.map][from.point][to.direction].link.backward　= { map: to.map, point: to.point, direction: to.direction };
+    } else {
+        console.log("map:"+from.map);
+        console.log("point:"+from.point);
+        console.log("direction:"+from.direction);
+        alert("不正なリンクがあります。コンソールをチェックしてください。")
+    }
+
+    // to -> fromのリンク（改善:上と一緒）
+    if(isPoint(to.map,to.point)){
+        scenes[to.map][to.point][to.direction].link.forward = { map: from.map, point: from.point, direction: to.direction };
+        scenes[to.map][to.point][from.direction].link.backward = { map: from.map, point: from.point, direction: from.direction };
+    } else {
+        console.log("map:"+to.map);
+        console.log("point:"+to.point);
+        console.log("direction:"+to.direction);
+        alert("不正なリンクがあります。コンソールをチェックしてください。")
+    }
+
+    d =  google.maps.geometry.spherical.computeDistanceBetween(, )//2点間の距離
+    angle = -Math.sin(())
+
+    createArrow(angle);
+
 
 }
 
