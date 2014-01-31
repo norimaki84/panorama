@@ -76,6 +76,8 @@ removeMesh = function (mesh) {
 createArrow = function (angle) {
     'use strict';
 
+   // console.log(angle);
+
     var geometry01, geometry02,
         material01, material02,
         mesh01, mesh02,
@@ -108,9 +110,9 @@ createArrow = function (angle) {
 };
 
 //リンク先ポインタ削除
-removeArrow = function (allow) {
+removeArrow = function (arrow) {
     'use strict';
-    scene.remove(allow);
+    scene.remove(arrow);
 };
 
 getAngle = function (srcIndex, destIndex) {
@@ -120,33 +122,46 @@ getAngle = function (srcIndex, destIndex) {
         destLat,　destLng,
         destLatLng;
 
+
+
     srcLat = parseFloat(points[srcIndex].lat, 10);
     srcLng = parseFloat(points[srcIndex].lng, 10);
     srcLatLng = new google.maps.LatLng(srcLat, srcLng);
 
+    console.log(srcLatLng);
+
     destLat = parseFloat(points[destIndex].lat, 10);
-    destLat = parseFloat(points[destIndex].lng, 10);
+    destLng = parseFloat(points[destIndex].lng, 10);
     destLatLng = new google.maps.LatLng(destLat, destLng);
 
     return google.maps.geometry.spherical.computeHeading(srcLatLng, destLatLng);
-}
+};
 
-createArrows = function()　{
-    'use strict'
+createArrows = function ()　{
+    'use strict';
 
-    var index, i, dest, angle, j;
+    console.log("createArrows");
+
+    var index, i, id, dest, angle, j;
 
     index = currentMesh.index;
+    console.log(points);
+
     id = points[index].id;
+    console.log(points[index].id);
 
     for (i = 0; i < links.length; i += 1) {
+        console.log('for01');
+        console.log(links[i].from);
+        //console.log(id);
         if (links[i].from === id) {
+            console.log('if01');
             dest = links[i].to;
             for (j = 0; j < points.length; j += 1) {
                 if (points[j].id === dest) {
                     angle = getAngle(index, j);
                     createArrow(angle);
-                    break;                    
+                    break;
                 }
             }
         } else if (links[i].to === id) {
@@ -155,13 +170,13 @@ createArrows = function()　{
                 if (points[j].id === dest) {
                     angle = getAngle(index, j);
                     createArrow(angle);
-                    break;                    
+                    break;
                 }
             }
         }
     }
 
-}
+};
 
 // メッシュの生成
 createMesh = function (order, index) {
@@ -226,7 +241,7 @@ createMesh = function (order, index) {
         if (order === 'current') {
             mesh.name = 'current';
             currentMesh = mesh;
-            createArrow();
+            createArrows();
         } else if (order === 'next') {
             mesh.name = 'next';
             nextMesh = mesh;
@@ -234,7 +249,7 @@ createMesh = function (order, index) {
             isLoading = 'finished';
         }
 
-        scene.add(mesh);
+        //scene.add(mesh);
     };
 
     onError = function () {
@@ -452,15 +467,17 @@ initRealityWalker = function () {
                 camera.updateProjectionMatrix();
             }
         };
-
+/*
         //マウスクリックの取得(リンク先ポインタをクリックした時)
         mouseclick = function (event){
             var projector = new THREE.Projector();
 
             if (ev.target == renderer.domElement) { 
 
+                var recr, ray, obj;
+
                 //マウス座標2D変換
-                var rect = ev.target.getBoundingClientRect();    
+                rect = ev.target.getBoundingClientRect();    
                 mouse.x =  ev.clientX - rect.left;
                 mouse.y =  ev.clientY - rect.top;
                 
@@ -475,10 +492,10 @@ initRealityWalker = function () {
                 projector.unprojectVector( vector, camera );
 
                 // 始点, 向きベクトルを渡してレイを作成
-                var ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+                ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
                 
                  // クリック判定
-                var obj = ray.intersectObjects( targetList );
+                obj = ray.intersectObjects( targetList );
                 
                  // クリックしていたら、alertを表示  
                 if ( obj.length > 0 ){                       
@@ -489,7 +506,7 @@ initRealityWalker = function () {
 
             }
         }; 
-
+*/
         // イベントハンドラの登録
         jQuery(window).bind('resize',    function (event) { resize(event); });
         jQuery(window).bind('keyup',     function (event) { keyup(event); });
@@ -549,7 +566,7 @@ render = function () {
             scene.add(currentMesh);
 
             //リンク先ポインタを新たに生成
-            createArrow();
+            createArrows();
 
             isTranslating = false;
         } else {
@@ -583,7 +600,7 @@ render = function () {
 jQuery(document).ready(function () {
     'use strict';
     // データファイルの指定
-    var pointsFile = 'points.kokubo.json',
+    var pointsFile = 'points.json',
         mapsFile = 'maps.json',
         linksFile = 'links.json',
         dateFile = 'date.json',
@@ -605,7 +622,7 @@ jQuery(document).ready(function () {
                 points = json;
             });
         }).error(function () {
-            window.alert("エラー: points.kokubo.json");
+            window.alert("エラー: points.json");
         }).next(function () {
             return jQuery.getJSON(linksFile, { format: 'json' }, function (json) {
                 links = json;
