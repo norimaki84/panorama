@@ -1,11 +1,11 @@
 /*jslint browser:true, devel:true */
 /*global Deferred, next, Detector, THREE, requestAnimationFrame, jQuery, google */
 
-var renderer, scene, camera, currentMesh, nextMesh, nextMeshInitialPosition,
+var renderer, scene, camera, currentMesh, nextMesh, nextMeshInitialPosition, group,
     // データ
     maps, points, links, date, modals,
     // メソッド
-    detectSupportWebGL, createMesh, setNextMeshPosition, removeMesh, initRealityWalker, render,
+    detectSupportWebGL, createMesh, setNextMeshPosition, removeMesh, initRealityWalker, render, mouseclick,
     createArrow, removeArrow, getAngle, createArrows,
     //オブシェクトを格納
     targetList = [],
@@ -14,7 +14,7 @@ var renderer, scene, camera, currentMesh, nextMesh, nextMeshInitialPosition,
     isTranslating = false,
     isLoading = false,
     debug = false, // デバッグ表示しない
-    // debug = "centerview", // デバッグ表示: カメラを中心に
+    //debug = "centerview", // デバッグ表示: カメラを中心に
     // debug = "birdview", // デバッグ表示: カメラを鳥瞰に
     // パラメータ
     lat, lon,
@@ -76,37 +76,37 @@ removeMesh = function (mesh) {
 createArrow = function (angle) {
     'use strict';
 
-   // console.log(angle);
+    console.log(angle);
 
     var geometry01, geometry02,
         material01, material02,
         mesh01, mesh02,
         cube01, cube02,
-        scene,
         r = 0.8,
         group;
 
     geometry01 = new THREE.CubeGeometry(0.03, 0.02, 0.09); // 立方体作成01
-    material01 = new THREE.MeshBasicMaterial({color: 0x0000aa}); // 材質作成
+    material01 = new THREE.MeshBasicMaterial({color: 0xffffff}); // 材質作成
     mesh01     = new THREE.Mesh(geometry01, material01); // 立方体01と材質を結びつけてメッシュ作成
     mesh01.position = new THREE.Vector3(-0.03, 0, 0);
     cube01 = mesh01;
 
     geometry02 = new THREE.CubeGeometry(0.09, 0.02, 0.03); // 立方体作成02
-    material02 = new THREE.MeshBasicMaterial({color: 0x0000aa}); // 材質作成
+    material02 = new THREE.MeshBasicMaterial({color: 0xffffff}); // 材質作成
     mesh02     = new THREE.Mesh(geometry02, material02); // 立方体02と材質を結びつけてメッシュ作成
     mesh02.position = new THREE.Vector3(0, 0, -0.03);
     cube02 = mesh02;
 
-    scene = new THREE.Scene(); // シーン作成
     group = new THREE.Object3D();
     group.add(cube01);
     group.add(cube02);
 
-    group.position = new THREE.Vector3(r * Math.cos(angle / 180 * Math.PI), -0.2, r * Math.sin(angle / 180 * Math.PI));　//ポインタの座標
+    group.position = new THREE.Vector3(-r * Math.cos(angle / 180 * Math.PI), -0.2, -r * Math.sin(angle / 180 * Math.PI));　//ポインタの座標    
     group.rotation.set(0, (225 - angle) / 180, 0); //ｙ軸を中心に180度か移転
 
-    scene.add(group); // シーンにメッシュ追加
+    console.log(group.position);
+
+    scene.add(group); // シーンにgroup追加
 };
 
 //リンク先ポインタ削除
@@ -151,11 +151,9 @@ createArrows = function ()　{
     console.log(points[index].id);
 
     for (i = 0; i < links.length; i += 1) {
-        console.log('for01');
         console.log(links[i].from);
         //console.log(id);
         if (links[i].from === id) {
-            console.log('if01');
             dest = links[i].to;
             for (j = 0; j < points.length; j += 1) {
                 if (points[j].id === dest) {
@@ -249,7 +247,7 @@ createMesh = function (order, index) {
             isLoading = 'finished';
         }
 
-        //scene.add(mesh);
+        scene.add(mesh);
     };
 
     onError = function () {
@@ -297,7 +295,12 @@ initRealityWalker = function () {
 
         // 緯度経度からθφを導出
         phi   = (90 - lat) * Math.PI / 180;
+        //phi = 0;
         theta = lon * Math.PI / 180;
+        //theta = -55 * Math.PI / 180;
+        //theta = 0;
+
+        console.log(camera.position);
 
         camera.lookAt({
             x: Math.sin(phi) * Math.cos(theta),
@@ -467,54 +470,62 @@ initRealityWalker = function () {
                 camera.updateProjectionMatrix();
             }
         };
-/*
+
         //マウスクリックの取得(リンク先ポインタをクリックした時)
-        mouseclick = function (event){
-            var projector = new THREE.Projector();
+        mouseclick = function (event) {
 
-            if (ev.target == renderer.domElement) { 
+            var projector,
+                vector,
+                rect,
+                ray,
+                obj;
 
-                var recr, ray, obj;
+            projector = new THREE.Projector();
+
+            if (event.target === renderer.domElement) { 
 
                 //マウス座標2D変換
-                rect = ev.target.getBoundingClientRect();    
-                mouse.x =  ev.clientX - rect.left;
-                mouse.y =  ev.clientY - rect.top;
-                
+                rect = event.target.getBoundingClientRect();
+                onPointerDownPointerX =  event.clientX - rect.left;
+                onPointerDownPointerY =  event.clientY - rect.top;
+
                 //マウス座標3D変換 width（横）やheight（縦）は画面サイズ
-                mouse.x =  (mouse.x / width) * 2 - 1;           
-                mouse.y = -(mouse.y / height) * 2 + 1;
-                
+                onPointerDownPointerX =  (onPointerDownPointerX / width) * 2 - 1;
+                onPointerDownPointerY = -(onPointerDownPointerY / height) * 2 + 1;
+
                 // マウスベクトル
-                var vector = new THREE.Vector3( mouse.x, mouse.y ,1);
+                vector = new THREE.Vector3(onPointerDownPointerX, onPointerDownPointerY ,1);
 
                // vector はスクリーン座標系なので, オブジェクトの座標系に変換
-                projector.unprojectVector( vector, camera );
+                projector.unprojectVector(vector, camera);
 
                 // 始点, 向きベクトルを渡してレイを作成
-                ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
-                
-                 // クリック判定
-                obj = ray.intersectObjects( targetList );
-                
-                 // クリックしていたら、alertを表示  
-                if ( obj.length > 0 ){                       
-                  
-                  alert("click!!")
-                  
-                } 
+                ray = new THREE.Raycaster(camera.position, vector.sub( camera.position ).normalize() );
 
+                 // クリック判定
+                obj = ray.intersectObjects(targetList);
+
+                 // クリックしていたら、alertを表示  
+                if (obj.length > 0 ){
+
+                  alert("click!!");
+
+                }
+                //targetListにgroup(シーンに追加した矢印)を入れる
+                // クリックするオブジェクトを配列で渡す
+                targetList.push(group);
             }
-        }; 
-*/
+        };
+
         // イベントハンドラの登録
-        jQuery(window).bind('resize',    function (event) { resize(event); });
-        jQuery(window).bind('keyup',     function (event) { keyup(event); });
-        jQuery(window).bind('keydown',   function (event) { keydown(event); });
-        jQuery(window).bind('mousedown', function (event) { mousedown(event); });
-        jQuery(window).bind('mouseup',   function (event) { mouseup(event); });
-        jQuery(window).bind('mousemove', function (event) { mousemove(event); });
-        jQuery(window).bind('blur',      function (event) { blured(event); });
+        jQuery(window).bind('resize',      function (event) { resize(event); });
+        jQuery(window).bind('keyup',       function (event) { keyup(event); });
+        jQuery(window).bind('keydown',     function (event) { keydown(event); });
+        jQuery(window).bind('mousedown',   function (event) { mousedown(event); });
+        jQuery(window).bind('mouseup',     function (event) { mouseup(event); });
+        jQuery(window).bind('mousemove',   function (event) { mousemove(event); });
+        jQuery(window).bind('blur',        function (event) { blured(event); });
+        jQuery(window).bind('mouseclick',  function (event) { mouseclick(event); });
 
         window.addEventListener('mousewheel', mouseWheel, false);
         window.addEventListener('DOMMouseScroll', mouseWheel, false);
