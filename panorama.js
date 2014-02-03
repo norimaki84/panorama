@@ -6,14 +6,14 @@ var renderer, scene, camera, currentMesh, nextMesh, nextMeshInitialPosition, gro
     maps, points, links, date, modals,
     // メソッド
     detectSupportWebGL, createMesh, setNextMeshPosition, removeMesh, initRealityWalker, render,
-    createArrow, removeArrows, getAngle, createArrows,
+    createArrow, removeArrow, getAngle, createArrows,
     //オブシェクトを格納
-    targetList = [],
+    rayReceiveObjects = [],
+    cubes = [],
     // フラグ
     isRotating = false,
     isTranslating = false,
     isLoading = false,
-    isClick = false,
     debug = false, // デバッグ表示しない
     //debug = "centerview", // デバッグ表示: カメラを中心に
     // debug = "birdview", // デバッグ表示: カメラを鳥瞰に
@@ -79,12 +79,12 @@ createArrow = function (angle) {
 
     console.log(angle);
 
-    var geometry01, geometry02,
-        material01, material02,
-        mesh01, mesh02,
-        cube01, cube02,
-        r = 0.8,
-        group;
+    var geometry01,
+        material01,
+        mesh01,
+        cube01,
+        r = 0.8;
+
 
     geometry01 = new THREE.CubeGeometry(0.03, 0.02, 0.09); // 立方体作成01
     material01 = new THREE.MeshBasicMaterial({color: 0xffffff}); // 材質作成
@@ -92,26 +92,21 @@ createArrow = function (angle) {
     mesh01.position = new THREE.Vector3(-0.03, 0, 0);
     cube01 = mesh01;
 
-    geometry02 = new THREE.CubeGeometry(0.09, 0.02, 0.03); // 立方体作成02
-    material02 = new THREE.MeshBasicMaterial({color: 0xffffff}); // 材質作成
-    mesh02     = new THREE.Mesh(geometry02, material02); // 立方体02と材質を結びつけてメッシュ作成
-    mesh02.position = new THREE.Vector3(0, 0, -0.03);
-    cube02 = mesh02;
+    cube01.position = new THREE.Vector3(-r * Math.cos(angle / 180 * Math.PI), -0.2, -r * Math.sin(angle / 180 * Math.PI));　//ポインタの座標    
+    cube01.rotation.set(0, (225 - angle) / 180, 0); //ｙ軸を中心に180度か移転
 
-    group = new THREE.Object3D();
-    group.add(cube01);
-    group.add(cube02);
+    cubes[0] = cube01;
 
-    group.position = new THREE.Vector3(-r * Math.cos(angle / 180 * Math.PI), -0.2, -r * Math.sin(angle / 180 * Math.PI));　//ポインタの座標    
-    group.rotation.set(0, (225 - angle) / 180, 0); //ｙ軸を中心に180度か移転
+    scene.add(cubes[0]);
 
-    console.log(group.position);
     //作ったポインタオブジェクトをリストに格納
-    targetList.push(group);
+    rayReceiveObjects.push(cubes[0]);
+};
 
-    scene.add(group); // シーンにgroup追加
-
-
+//リンク先ポインタ削除
+removeArrow = function (arrow) {
+    'use strict';
+    scene.remove(arrow);
 };
 
 
@@ -174,12 +169,6 @@ createArrows = function ()　{
         }
     }
 
-};
-
-//リンク先ポインタ削除
-removeArrows = function (arrows) {
-    'use strict';
-    scene.remove(arrows);
 };
 
 // メッシュの生成
@@ -301,10 +290,7 @@ initRealityWalker = function () {
 
         // 緯度経度からθφを導出
         phi   = (90 - lat) * Math.PI / 180;
-        //phi = 0;
-        //theta = lon * Math.PI / 180;
-        theta = 130 * Math.PI / 180;
-        //theta = 0;
+        theta = lon * Math.PI / 180;
 
         console.log(camera.position);
 
@@ -320,7 +306,7 @@ initRealityWalker = function () {
 
     // イベントの追加
     addEventHandlers = function () {
-        var isMoving, tryTranslatingOn, tryRotatingtingOn, tryClickingOn,
+        var isMoving, tryTranslatingOn, tryRotatingtingOn,//tryClickingOn,
             resize, keyup, keydown, mouseup, mousedown, mousemove, blured, mouseWheel,
             // 座標関係パラメータ
             onPointerDownLon = 0,
@@ -359,13 +345,6 @@ initRealityWalker = function () {
         tryRotatingtingOn = function () {
             if (!isMoving()) {
                 isRotating = true;
-            }
-        };
-
-        //マウスクリックの動作を試行
-        tryClickingOn = function () {
-            if (!isMoving()) {
-                isClick = true;
             }
         };
 
@@ -418,70 +397,43 @@ initRealityWalker = function () {
 
             var projector,
                 vector,
-                //rect,
-                ray,
-                obj;
+                intersects,
+                raycaster;
 
-            //クリック動作を試行
-            tryClickingOn();
+            // 現在のマウスの位置を記録
+            onPointerDownPointerX = event.clientX;
+            onPointerDownPointerY = event.clientY;
 
-            //マウスがポインタの上にある時
-            if (isClick === true) {
-                 // 現在のマウスの位置を記録
-                onPointerDownPointerX = event.clientX;
-                onPointerDownPointerY = event.clientY;
+            //マウス座標3D変換 width（横）やheight（縦）は画面サイズ
+            onPointerDownPointerX =  (onPointerDownPointerX  / window.innerWidth) * 2 - 1;
+            onPointerDownPointerY = -(onPointerDownPointerY / window.innerHeight) * 2 + 1;
 
-                projector = new THREE.Projector();
+            // マウスベクトル
+            vector = new THREE.Vector3(onPointerDownPointerX, onPointerDownPointerY, 1);
 
-                //マウス座標3D変換 width（横）やheight（縦）は画面サイズ
-                onPointerDownPointerX =  (onPointerDownPointerX / window.innerWidth) * 2 - 1;
-                onPointerDownPointerY = -(onPointerDownPointerY / window.innerHeight) * 2 + 1;
+            projector = new THREE.Projector();
 
-                // マウスベクトル
-                vector = new THREE.Vector3(onPointerDownPointerX, onPointerDownPointerY, 1);
+            // vector はスクリーン座標系なので, オブジェクトの座標系に変換
+            raycaster = projector.pickingRay(vector, camera);
 
-               // vector はスクリーン座標系なので, オブジェクトの座標系に変換
-                projector.unprojectVector(vector, camera);
+            //光線と交わるオブジェクトを収集
+            intersects = raycaster.intersectObjects(rayReceiveObjects);
 
-                // 始点, 向きベクトルを渡してレイを作成
-                ray = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
-
-                // クリック判定
-                obj = ray.intersectObjects(targetList);
-
-                 // クリックしていたら、alertを表示  
-                if (obj.length > 0) {
-
-                    alert("click!!");
-                }
-            } else if (isRotating === true) { //マウスがポインタ上以外をクリックした場合 
-
-                //回転移動を試行
+             // クリックしていたら、alertを表示
+            if (intersects.length > 0) {
+                alert("click!!");
+                //tryTranslatingOn(0);
+            } else { //マウスがポインタ上以外の場合は 
                 tryRotatingtingOn();
-
-                // 現在のマウスの位置を記録
-                onPointerDownPointerX = event.clientX;
-                onPointerDownPointerY = event.clientY;
-                // 現在の注視点の方向を記録
-                onPointerDownLon = lon;
-                onPointerDownLat = lat;
+                if (isRotating === true) {
+                    // 現在のマウスの位置を記録
+                    onPointerDownPointerX = event.clientX;
+                    onPointerDownPointerY = event.clientY;
+                    // 現在の注視点の方向を記録
+                    onPointerDownLon = lon;
+                    onPointerDownLat = lat;
+                }
             }
-
-/*
-            //回転移動を試行
-            tryRotatingtingOn();
-
-            // 回転モードに入ったら
-            if (isRotating === true) {
-                // 現在のマウスの位置を記録
-                onPointerDownPointerX = event.clientX;
-                onPointerDownPointerY = event.clientY;
-                // 現在の注視点の方向を記録
-                onPointerDownLon = lon;
-                onPointerDownLat = lat;
-            }
-
-*/
         };
 
         mousemove = function (event) {
@@ -539,53 +491,7 @@ initRealityWalker = function () {
                 camera.updateProjectionMatrix();
             }
         };
-/*
-        //マウスクリックの取得(リンク先ポインタをクリックした時)
-        mouseclick = function (event) {
 
-            var projector,
-                vector,
-                rect,
-                ray,
-                obj;
-
-            projector = new THREE.Projector();
-
-            if (event.target === renderer.domElement) { 
-
-                //マウス座標2D変換
-                rect = event.target.getBoundingClientRect();
-                onPointerDownPointerX =  event.clientX - rect.left;
-                onPointerDownPointerY =  event.clientY - rect.top;
-
-                //マウス座標3D変換 width（横）やheight（縦）は画面サイズ
-                onPointerDownPointerX =  (onPointerDownPointerX / width) * 2 - 1;
-                onPointerDownPointerY = -(onPointerDownPointerY / height) * 2 + 1;
-
-                // マウスベクトル
-                vector = new THREE.Vector3(onPointerDownPointerX, onPointerDownPointerY ,1);
-
-               // vector はスクリーン座標系なので, オブジェクトの座標系に変換
-                projector.unprojectVector(vector, camera);
-
-                // 始点, 向きベクトルを渡してレイを作成
-                ray = new THREE.Raycaster(camera.position, vector.sub( camera.position ).normalize() );
-
-                 // クリック判定
-                obj = ray.intersectObjects(targetList);
-
-                 // クリックしていたら、alertを表示  
-                if (obj.length > 0 ){
-
-                  alert("click!!");
-
-                }
-                //targetListにgroup(シーンに追加した矢印)を入れる
-                // クリックするオブジェクトを配列で渡す
-                targetList.push(group);
-            }
-        };
-*/
         // イベントハンドラの登録
         jQuery(window).bind('resize',      function (event) { resize(event); });
         jQuery(window).bind('keyup',       function (event) { keyup(event); });
@@ -594,7 +500,6 @@ initRealityWalker = function () {
         jQuery(window).bind('mouseup',     function (event) { mouseup(event); });
         jQuery(window).bind('mousemove',   function (event) { mousemove(event); });
         jQuery(window).bind('blur',        function (event) { blured(event); });
-        //jQuery(window).bind('mouseclick',  function (event) { mouseclick(event); });
 
         window.addEventListener('mousewheel', mouseWheel, false);
         window.addEventListener('DOMMouseScroll', mouseWheel, false);
@@ -630,7 +535,7 @@ render = function () {
 
         if (tick >= duration) {
             //リンク先ポインタを削除
-            removeArrows();
+            removeArrow();
 
             // メッシュを削除
             removeMesh(currentMesh);
