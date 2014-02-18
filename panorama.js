@@ -6,10 +6,11 @@ var renderer, scene, camera, currentMesh, nextMesh, nextMeshInitialPosition, gro
     maps, points, links, date, modals,
     // メソッド
     detectSupportWebGL, createMesh, setNextMeshPosition, removeMesh, initRealityWalker, render,
-    createArrow, removeArrow, getAngle, createArrows,
+    createArrow, removeArrow, getAngle, createArrows, removeArrows,
     //オブシェクトを格納
     rayReceiveObjects = [],
     cubes = [],
+    currentAllArrows = [],
     // フラグ
     isRotating = false,
     isTranslating = false,
@@ -74,10 +75,8 @@ removeMesh = function (mesh) {
 };
 
 //リンク先ポインタ表示(矢印)
-createArrow = function (angle) {
+createArrow = function (angle, id) {
     'use strict';
-
-    console.log(angle);
 
     var geometry01,
         material01,
@@ -85,8 +84,7 @@ createArrow = function (angle) {
         cube01,
         r = 0.8;
 
-
-    geometry01 = new THREE.CubeGeometry(0.03, 0.02, 0.09); // 立方体作成01
+    geometry01 = new THREE.CubeGeometry(0.03, 0.03, 0.03); // 立方体作成01
     material01 = new THREE.MeshBasicMaterial({color: 0xffffff}); // 材質作成
     mesh01     = new THREE.Mesh(geometry01, material01); // 立方体01と材質を結びつけてメッシュ作成
     mesh01.position = new THREE.Vector3(-0.03, 0, 0);
@@ -95,12 +93,15 @@ createArrow = function (angle) {
     cube01.position = new THREE.Vector3(-r * Math.cos(angle / 180 * Math.PI), -0.2, -r * Math.sin(angle / 180 * Math.PI));　//ポインタの座標    
     cube01.rotation.set(0, (225 - angle) / 180, 0); //ｙ軸を中心に180度か移転
 
-    cubes[0] = cube01;
+    cube01.id = id;
 
-    scene.add(cubes[0]);
+
+    scene.add(cube01);
+
+    currentAllArrows.push(cube01);
 
     //作ったポインタオブジェクトをリストに格納
-    rayReceiveObjects.push(cubes[0]);
+    rayReceiveObjects.push(cube01);
 };
 
 //リンク先ポインタ削除
@@ -117,13 +118,9 @@ getAngle = function (srcIndex, destIndex) {
         destLat,　destLng,
         destLatLng;
 
-
-
     srcLat = parseFloat(points[srcIndex].lat, 10);
     srcLng = parseFloat(points[srcIndex].lng, 10);
     srcLatLng = new google.maps.LatLng(srcLat, srcLng);
-
-    console.log(srcLatLng);
 
     destLat = parseFloat(points[destIndex].lat, 10);
     destLng = parseFloat(points[destIndex].lng, 10);
@@ -135,25 +132,19 @@ getAngle = function (srcIndex, destIndex) {
 createArrows = function ()　{
     'use strict';
 
-    console.log("createArrows");
-
     var index, i, id, dest, angle, j;
 
     index = currentMesh.index;
-    console.log(points);
 
     id = points[index].id;
-    console.log("points[index].id" + "は" + points[index].id);
 
     for (i = 0; i < links.length; i += 1) {
-        console.log(links[i].from);
-        //console.log(id);
         if (links[i].from === id) {
             dest = links[i].to;
             for (j = 0; j < points.length; j += 1) {
                 if (points[j].id === dest) {
                     angle = getAngle(index, j);
-                    createArrow(angle);
+                    createArrow(angle, points[j].id);
                     break;
                 }
             }
@@ -162,13 +153,22 @@ createArrows = function ()　{
             for (j = 0; j < points.length; j += 1) {
                 if (points[j].id === dest) {
                     angle = getAngle(index, j);
-                    createArrow(angle);
+                    createArrow(angle, points[j].id);
                     break;
                 }
             }
         }
     }
 
+};
+
+removeArrows = function () {
+    'use strict';
+    var i;
+
+    for (i = 0; i < currentAllArrows.length; i += 1) {
+        removeArrow(currentAllArrows[i]);
+    }
 };
 
 // メッシュの生成
@@ -292,8 +292,6 @@ initRealityWalker = function () {
         phi   = (90 - lat) * Math.PI / 180;
         theta = lon * Math.PI / 180;
 
-        console.log(camera.position);
-
         camera.lookAt({
             x: Math.sin(phi) * Math.cos(theta),
             y: Math.cos(phi),
@@ -398,7 +396,9 @@ initRealityWalker = function () {
             var projector,
                 vector,
                 intersects,
-                raycaster;
+                raycaster,
+                i,
+                j;
 
             // 現在のマウスの位置を記録
             onPointerDownPointerX = event.clientX;
@@ -419,10 +419,15 @@ initRealityWalker = function () {
             //光線と交わるオブジェクトを収集
             intersects = raycaster.intersectObjects(rayReceiveObjects);
 
-             // クリックしていたら、alertを表示
+             // クリックしていたら、リンク先へ移動
             if (intersects.length > 0) {
-                alert("click!!");
-                //tryTranslatingOn(0);
+                for (i = 0; i < intersects.length; i += 1) {
+                    for (j = 0; j < points.length; j += 1) {
+                        if (points[j].id === intersects[i].object.id) {
+                            tryTranslatingOn(j);
+                        }
+                    }
+                }
             } else { //マウスがポインタ上以外の場合は 
                 tryRotatingtingOn();
                 if (isRotating === true) {
@@ -525,6 +530,11 @@ render = function () {
     // テクスチャーのロードが終わったら
     if (isLoading === 'finished') {
         isTranslating = true;
+
+        //リンク先ポインタを削除
+        removeArrows();
+        rayReceiveObjects = [];
+
         isLoading = false;
         tick = 0;
     }
@@ -534,9 +544,6 @@ render = function () {
         tick += 1;
 
         if (tick >= duration) {
-            //リンク先ポインタを削除
-            removeArrow();
-
             // メッシュを削除
             removeMesh(currentMesh);
             removeMesh(nextMesh);
