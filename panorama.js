@@ -17,7 +17,7 @@ var renderer, scene, camera, currentMesh, nextMesh, nextMeshInitialPosition, gro
     isLoading = false,
     debug = false, // デバッグ表示しない
     //debug = "centerview", // デバッグ表示: カメラを中心に
-    // debug = "birdview", // デバッグ表示: カメラを鳥瞰に
+    //debug = "birdview", // デバッグ表示: カメラを鳥瞰に
     // パラメータ
     lat, lon,
     duration = 60,
@@ -90,7 +90,7 @@ createArrow = function (angle, id) {
     mesh01.position = new THREE.Vector3(-0.03, 0, 0);
     cube01 = mesh01;
 
-    cube01.position = new THREE.Vector3(-r * Math.cos(angle / 180 * Math.PI), -0.2, -r * Math.sin(angle / 180 * Math.PI));　//ポインタの座標    
+    cube01.position = new THREE.Vector3(-r * Math.cos(angle / 180 * Math.PI), -0.2, -r * Math.sin(angle / 180 * Math.PI)); //ポインタの座標    
     cube01.rotation.set(0, (225 - angle) / 180, 0); //ｙ軸を中心に180度か移転
 
     cube01.id = id;
@@ -524,6 +524,11 @@ render = function () {
     'use strict';
     var ratio, // 比率
         nextMeshPosition; // 次のメッシュの位置
+/*
+    if (nextMesh){    
+        nextMesh.material.opacity = 0;
+    };
+*/
 
     requestAnimationFrame(render);
 
