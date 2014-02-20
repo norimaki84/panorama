@@ -90,7 +90,7 @@ createArrow = function (angle, id) {
     mesh01.position = new THREE.Vector3(-0.03, 0, 0);
     cube01 = mesh01;
 
-    cube01.position = new THREE.Vector3(-r * Math.cos(angle / 180 * Math.PI), -0.2, -r * Math.sin(angle / 180 * Math.PI)); //ポインタの座標    
+    cube01.position = new THREE.Vector3(-r * Math.cos(angle / 180 * Math.PI), -0.2, -r * Math.sin(angle / 180 * Math.PI)); //ポインタの座標
     cube01.rotation.set(0, (225 - angle) / 180, 0); //ｙ軸を中心に180度か移転
 
     cube01.id = id;
@@ -301,10 +301,9 @@ initRealityWalker = function () {
         scene.add(camera);
     };
 
-
     // イベントの追加
     addEventHandlers = function () {
-        var isMoving, tryTranslatingOn, tryRotatingtingOn,//tryClickingOn,
+        var isMoving, tryTranslatingOn, tryRotatingtingOn,
             resize, keyup, keydown, mouseup, mousedown, mousemove, blured, mouseWheel,
             // 座標関係パラメータ
             onPointerDownLon = 0,
@@ -419,7 +418,7 @@ initRealityWalker = function () {
             //光線と交わるオブジェクトを収集
             intersects = raycaster.intersectObjects(rayReceiveObjects);
 
-             // クリックしていたら、リンク先へ移動
+            // クリックしていたら、リンク先へ移動
             if (intersects.length > 0) {
                 for (i = 0; i < intersects.length; i += 1) {
                     for (j = 0; j < points.length; j += 1) {
@@ -524,11 +523,6 @@ render = function () {
     'use strict';
     var ratio, // 比率
         nextMeshPosition; // 次のメッシュの位置
-/*
-    if (nextMesh){    
-        nextMesh.material.opacity = 0;
-    };
-*/
 
     requestAnimationFrame(render);
 
